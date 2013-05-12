@@ -1,0 +1,2 @@
+Images from:
+http://harmattan-dev.nokia.com/docs/library/html/qt4/stylesheet-examples.html

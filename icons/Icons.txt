@@ -1,0 +1,45 @@
+Canard.png
+
+All of the following Icons are from:
+http://openiconlibrary.sourceforge.net/gallery2/?./
+
+Branch.png
+http://openiconlibrary.sourceforge.net/gallery2/?./Icons/actions/go-next-context.png
+
+old: http://openiconlibrary.sourceforge.net/gallery2/?./Icons/symbols/pictograms-road_signs-roadlayout_sign_7.png
+
+ConditionalTree.png
+-- http://openiconlibrary.sourceforge.net/gallery2/?./Icons/symbols/pictograms-road_signs-roadlayout_sign_2.png
+
+Derived.png
+http://openiconlibrary.sourceforge.net/gallery2/?./Icons/actions/view-filter.png
+
+Loop.png
+http://openiconlibrary.sourceforge.net/gallery2/?./Icons/symbols/pictograms-road_signs-roundabout_sign.png
+
+ModuleLogic.png
+http://openiconlibrary.sourceforge.net/gallery2/?./Icons/actions/view-list-tree-3.png
+
+Module.png
+http://openiconlibrary.sourceforge.net/gallery2/?./Icons/others/book.png
+
+Populations.png
+http://openiconlibrary.sourceforge.net/gallery2/?./Icons/actions/view-process-users.png
+
+Question.png
+http://openiconlibrary.sourceforge.net/gallery2/?./Icons/status/dialog-question.png
+
+Sequence
+http://openiconlibrary.sourceforge.net/gallery2/?./Icons/emblems/emblem-interrobang.png
+
+Statement.png
+http://openiconlibrary.sourceforge.net/gallery2/?./Icons/emblems/emblem-important-2.png
+
+StopModule.png
+-- http://openiconlibrary.sourceforge.net/gallery2/?./Icons/symbols/pictograms-road_signs-stop_sign.png
+Alternate:
+-- http://openiconlibrary.sourceforge.net/gallery2/?./Icons/symbols/road-sign-us-yield.png
+
+
+SubModules.png
+http://openiconlibrary.sourceforge.net/gallery2/?./Icons/actions/documentation.png
