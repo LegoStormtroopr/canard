@@ -31,6 +31,7 @@ class QuestionModule(QtCore.QAbstractItemModel):
                 _ns('s',"Branch"):  QtGui.QIcon("icons/Branch.png"),
                 _ns('s',"ForLoop"):  QtGui.QIcon("icons/Loop.png"),
                 _ns('s',"ModuleExitPoint"):  QtGui.QIcon("icons/StopModule.png"),
+                _ns('s',"WordSub"):  QtGui.QIcon("icons/WordSub.png"),
                 }
     def setSelected(self,selected):
         self.selected = selected
@@ -76,6 +77,25 @@ class QuestionModule(QtCore.QAbstractItemModel):
                 icon=QtGui.QIcon("icons/Populations.png")
                 )
         module.appendChild(populations)
+
+        ws = data.xpath('./s:WordSubstitutions',namespaces=_namespaces)
+        if len(ws) == 0:
+            ws = etree.Element("{%s}WordSubstitutions"%(_namespaces['s']))
+            # Need to re-think this part, it was rushed.
+            # We won't insert it yet
+            # data.insert(0,pop)
+        else:
+            ws = ws[0]
+
+        wordSubs = SQBLModuleUnnamedItem(
+                ws,
+                module,
+                label=u"Word Substitutions",
+                icon=QtGui.QIcon("icons/Populations.png")
+                )
+        module.appendChild(wordSubs)
+        for sub in ws.iterchildren(tag=_ns('s','WordSub')):
+            wordSubs.appendChild(SQBLModuleNamedItem(sub,wordSubs))
 
         modLogic = [i for i in data.iterchildren(tag=_ns('s','ModuleLogic'))][0]
         logic = SQBLModuleUnnamedItem(

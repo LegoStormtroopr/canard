@@ -954,3 +954,28 @@ class RichTextToolBar(QtGui.QWidget):
         self.fontComboBox = QtGui.QFontComboBox(self.frame)
         self.horizontalLayout.addWidget(self.fontComboBox)
 
+class WordSub(SQBLWeirdThingWidget, sqblUI.wordSub.Ui_Form):
+    def __init__(self,element,model):
+        SQBLWeirdThingWidget.__init__(self,element,model)
+
+        self.connectAddRemoveLanguages(self.addLanguage,self.removeLanguage,self.languages)
+        self.configureLanguages(self.languages)
+
+        self.wordSubText.textChanged.connect(self.updateTagName)
+        self.languages.currentIndexChanged[int].connect(self.updateField)
+
+    def updateTagName(self,text):
+        lang = self.languages.itemData(self.languages.currentIndex()).toPyObject()
+        elem = self.element.xpath("./s:ResultString" % (tagname),namespaces=_namespaces)[0]
+        self.updateTextComponent(lang,text,elem)
+
+    # This function updates the value of this text box if the language picker changes
+    def updateField(self,index):
+        lang = str(langPicker.itemData(index).toPyObject())
+        text = self.element.xpath("./s:ResultString/s:TextComponent[@xml:lang='%s']" % (tagname,lang),namespaces=_namespaces)
+        value = ""
+        if len(text) > 0:
+            value = text[0].textText(value)
+        self.wordSubText.set
+        self.update()
+
