@@ -168,6 +168,8 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
             newWidget = SQBLWidgets.LoopFor(self.selected,self.model)
         if self.selected.tag == _ns("s","ModuleExitPoint"):
             newWidget = SQBLWidgets.StopModule(self.selected,self.model)
+        if self.selected.tag == _ns("s","WordSub"):
+            newWidget = SQBLWidgets.WordSub(self.selected,self.model)
         if newWidget is None:
             newWidget = SQBLWidgets.UnsupportedWidget()
         if newWidget is not None:

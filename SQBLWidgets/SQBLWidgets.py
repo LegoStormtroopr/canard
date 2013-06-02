@@ -296,7 +296,7 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
             # This is concatenated in reverse, as the ancestors come in order from the question back to the root, and we want the opposite.
             resps = a.xpath("./s:TextComponent/s:TargetRespondent",namespaces=_namespaces)
             text = "   "*i
-            if len(resps) > 0:
+            if len(resps) > 0 and resps[0].text is not None:
                 text = text + resps[0].text
             else:
                 text = text + "Undescribed population"
