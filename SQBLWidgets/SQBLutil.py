@@ -118,7 +118,7 @@ class SQBLUnnamedWidget(SQBLWidget):
 
         for text in self.element.xpath("./s:TextComponent",namespaces=_namespaces):
             self.texts.append(text.get(_ns("xml","lang")))
-        if self.activeLanguage not in self.texts:
+        if self.activeLanguage not in self.texts and len(self.texts) > 0:
             self.activeLanguage = self.texts[0]
 
         self.languagePicker = languagePicker.LanguagePickerWidget(

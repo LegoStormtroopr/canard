@@ -530,12 +530,12 @@ def newQuestion(name,lang):
     """.format(s=_namespaces['s'],
         question_name = name)
 
-def newForLoop(name):
+def newStatement(name):
     return """
         <Statement xmlns="%s" name="%s_$numItems"/>
     """%(_namespaces['s'],name)
 
-def newStatement(name):
+def newForLoop(name):
     return """
         <ForLoop xmlns="%s" name="%s_$numItems" question="">
             <LoopedLogic></LoopedLogic>
