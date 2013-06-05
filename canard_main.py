@@ -170,6 +170,8 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
             newWidget = SQBLWidgets.StopModule(self.selected,self.model)
         if self.selected.tag == _ns("s","WordSub"):
             newWidget = SQBLWidgets.WordSub(self.selected,self.model)
+        if self.selected.tag == _ns("s","QuestionGroup"):
+            newWidget = SQBLWidgets.QuestionGroup(self.selected,self.model)
         if newWidget is None:
             newWidget = SQBLWidgets.UnsupportedWidget()
         if newWidget is not None:
@@ -226,7 +228,6 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
         from lxml import etree
         try:
             sqbl_xsd = etree.XMLSchema(etree.parse("./sqbl/sqbl.xsd"))
-            sqbl_xsd.assertValid(etree.parse(StringIO.StringIO(xml)))
 
             self.model = SQBLmodel.QuestionModule(xml)
             #Catch updates to the model and update views.

@@ -18,6 +18,10 @@ class UnsupportedWidget(SQBLWidget,sqblUI.unsupportedWidget.Ui_Form):
     def __init__(self):
         SQBLWidget.__init__(self,None,None)
 
+class QuestionGroup(SQBLNamedWidget, sqblUI.questionGroup.Ui_Form):
+    def __init__(self,element,model):
+        SQBLNamedWidget.__init__(self,element,model,QuestionText)
+
 class LoopFor(SQBLNamedWidget, sqblUI.loopFor.Ui_Form):
     def __init__(self,element,model):
         SQBLNamedWidget.__init__(self,element,model,LogicNodeText)

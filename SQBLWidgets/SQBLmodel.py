@@ -28,9 +28,10 @@ class QuestionModule(QtCore.QAbstractItemModel):
                 _ns('s',"Statement"): QtGui.QIcon("icons/Statement.png"),
                 _ns('s',"ConditionalTree"): QtGui.QIcon("icons/ConditionalTree.png"),
                 _ns('s',"Question"):  QtGui.QIcon("icons/Question.png"),
-                _ns('s',"Branch"):  QtGui.QIcon("icons/Branch.png"),
                 _ns('s',"ForLoop"):  QtGui.QIcon("icons/Loop.png"),
                 _ns('s',"ModuleExitPoint"):  QtGui.QIcon("icons/StopModule.png"),
+                _ns('s',"QuestionGroup"):  QtGui.QIcon("icons/QuestionGroup.png"),
+                _ns('s',"Branch"):  QtGui.QIcon("icons/Branch.png"),
                 _ns('s',"WordSub"):  QtGui.QIcon("icons/WordSub.png"),
                 }
     def setSelected(self,selected):
@@ -226,12 +227,15 @@ class QuestionModule(QtCore.QAbstractItemModel):
     def dropMimeData(self, data, action, row, column, parent):
 
         parent = parent.internalPointer()
+        element = etree.fromstring(str(data.data('text/xml+x-sqbl')))
         if parent.canDrop():
             if data.hasFormat("text/xml+x-sqbl+new"):
                 self.aboutToMove = None
-            element = etree.fromstring(str(data.data('text/xml+x-sqbl')))
             if element.tag == _ns("s","Branch"):
                 # We can't just drop branches anywhere!
+                return False
+            if parent.element.tag == _ns("s","QuestionGroup") and \
+                    element.tag != _ns("s","Question"):
                 return False
             if self.aboutToMove is not None:
                 # If we are about to move something internally, and its a move operation:
@@ -430,16 +434,19 @@ class SQBLModuleTreeItem(TreeItem):
                 
     def canDrop(self):
         #Most SQBL things can't be dropped on, so define those that can
-        if self.element.tag == _ns("s","Branch") or \
-           self.element.tag == _ns("s","ModuleLogic") or \
-           False :
+        if self.element.tag in (
+               _ns("s","Branch"),
+               _ns("s","ModuleLogic"),
+               _ns("s","QuestionGroup"),
+           ):
             return True
         return False
     def canDrag(self):
         #Most SQBL things can be dragged, so define those that can't
-#        if self.element.tag == _ns("s","Branch") or \ # Gotten rid of as branches can be dragged to conditional sequence guides
-        if self.element.tag == _ns("s","ModuleLogic") or \
-           False :
+        if self.element.tag in (
+               _ns("s","Branch"),
+               _ns("s","ModuleLogic"),
+           ):
             return False
         return True
 
@@ -450,6 +457,10 @@ class SQBLModuleTreeItem(TreeItem):
             # We actually need to put the item in the BranchLogic element just under here.
             # There is only, so just take the first
             dropSpot = self.element.xpath("./s:BranchLogic",namespaces=_namespaces)[0]
+        elif self.element.tag == _ns("s","QuestionGroup"):
+            # We actually need to put the item in the BranchLogic element just under here.
+            # There is only, so just take the first
+            dropSpot = self.element.xpath("./s:GroupedQuestions",namespaces=_namespaces)[0]
         if position == -1:
             self.childItems.append(child)
             dropSpot.append(child.element)
@@ -496,6 +507,10 @@ class SQBLModuleNamedItem(SQBLModuleTreeItem):
                 self.appendChild(SQBLModuleNamedItem(x,self))
         if self.element.tag == _ns('s','ForLoop'):
             logic = [i for i in self.element.iterchildren(tag=_ns('s','LoopedLogic'))][0]
+            for x in logic.iterchildren():
+                self.appendChild(SQBLModuleNamedItem(x,self))
+        if self.element.tag == _ns('s','QuestionGroup'):
+            logic = [i for i in self.element.iterchildren(tag=_ns('s','GroupedQuestions'))][0]
             for x in logic.iterchildren():
                 self.appendChild(SQBLModuleNamedItem(x,self))
 
@@ -550,10 +565,19 @@ def newBranch(name):
         </Branch>
     """.format( s=_namespaces['s'],
                 branch_name = name,
-                statement_name = name+"Statement"
                 )
 
-def newConditionalTree(name,lang,question="QuestionID"):
+def newQuestionGroup(name,question="QuestionID"):
+    # We allow this to be non-conformant by not including a condition, and assume the user will 'do the right thing'
+    return """
+      <QuestionGroup xmlns="{s}" name="{name}_$numItems">
+            <GroupedQuestions>
+            </GroupedQuestions>
+        </QuestionGroup >
+    """.format( s=_namespaces['s'],
+                name=name,
+                )
+def newConditionalTree(name,question="QuestionID"):
     # We allow this to be non-conformant by not including a condition, and assume the user will 'do the right thing'
     return """
       <ConditionalTree xmlns="{s}" name="{name}_$numItems">
@@ -562,9 +586,6 @@ def newConditionalTree(name,lang,question="QuestionID"):
         </ConditionalTree>
     """.format( s=_namespaces['s'],
                 name=name,
-                branch_name = name+"_Branch",
-                question = question,
-                statement_name = name+"_Statement"
                 )
 
 
@@ -581,9 +602,9 @@ class NewItemsListModel(QtGui.QStandardItemModel):
                 _ns('s',"Statement"): QtGui.QIcon("icons/Statement.png"),
                 _ns('s',"ConditionalTree"): QtGui.QIcon("icons/ConditionalTree.png"),
                 _ns('s',"Question"):  QtGui.QIcon("icons/Question.png"),
-                _ns('s',"Branch"):  QtGui.QIcon("icons/Branch.png"),
                 _ns('s',"ForLoop"):  QtGui.QIcon("icons/Loop.png"),
                 _ns('s',"ModuleExitPoint"):  QtGui.QIcon("icons/StopModule.png"),
+                _ns('s',"QuestionGroup"):  QtGui.QIcon("icons/QuestionGroup.png"),
                 }
 
         parentItem = self.invisibleRootItem()
@@ -594,9 +615,11 @@ class NewItemsListModel(QtGui.QStandardItemModel):
                 ("Statement",_ns("s","Statement",),
                     newStatement("NewStatement")),
                 ("For Loop",_ns("s","ForLoop",),
-                    newStatement("NewForLoop")),
+                    newForLoop("NewForLoop")),
                 ("Conditional Tree",_ns("s","ConditionalTree"),
-                    newConditionalTree("NewTree","en")),
+                    newConditionalTree("NewTree")),
+                ("Question Group",_ns("s","QuestionGroup"),
+                    newQuestionGroup("NewGroup")),
             ]
         for name,tagname,item in newItems:
             item = NewModuleItem(name,item)
