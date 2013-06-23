@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>303</width>
-    <height>429</height>
+    <width>378</width>
+    <height>220</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -361,6 +361,38 @@
     <hint type="destinationlabel">
      <x>272</x>
      <y>161</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>hasMinLength</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>minLengthValue</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>91</x>
+     <y>81</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>112</x>
+     <y>81</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>hasMaxLength</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>maxLengthValue</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>77</x>
+     <y>124</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>118</x>
+     <y>126</y>
     </hint>
    </hints>
   </connection>
