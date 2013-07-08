@@ -1,0 +1,57 @@
+all : ui icons
+
+ui :  windows widgets
+
+windows: 
+	pyuic4 ui/sqbl_main.ui -o SQBLWidgets/sqblUI/sqbl_main.py
+
+widgets: 
+	pyuic4 ui/SQBL_module_pane.ui -o SQBLWidgets/sqblUI/SQBL_module_pane.py
+	pyuic4 ui/branch.ui -o SQBLWidgets/sqblUI/branch.py
+	pyuic4 ui/bulkQuestionEditor.ui -o SQBLWidgets/sqblUI/bulkQuestionEditor.py
+	pyuic4 ui/conditionalTree.ui -o SQBLWidgets/sqblUI/conditionalTree.py
+	pyuic4 ui/conditionalTreeText.ui -o SQBLWidgets/sqblUI/conditionalTreeText.py
+	pyuic4 ui/languagePicker.ui -o SQBLWidgets/sqblUI/languagePicker.py
+	pyuic4 ui/logicNodeText.ui -o SQBLWidgets/sqblUI/logicNodeText.py
+	pyuic4 ui/logicNodeText.ui -o SQBLWidgets/sqblUI/logicNodeText.py
+	pyuic4 ui/loopFor.ui -o SQBLWidgets/sqblUI/loopFor.py
+	pyuic4 ui/moduleLogic.ui -o SQBLWidgets/sqblUI/moduleLogic.py
+	pyuic4 ui/newLanguageTab.ui -o SQBLWidgets/sqblUI/newLanguageTab.py
+	pyuic4 ui/repositorySearch.ui -o SQBLWidgets/sqblUI/repositorySearch.py
+	pyuic4 ui/responseCodeList.ui -o SQBLWidgets/sqblUI/responseCodeList.py
+	pyuic4 ui/responseGeneric.ui -o SQBLWidgets/sqblUI/responseGeneric.py
+	pyuic4 ui/responseNumber.ui -o SQBLWidgets/sqblUI/responseNumber.py
+	pyuic4 ui/responseText.ui -o SQBLWidgets/sqblUI/responseText.py
+	pyuic4 ui/responseTab.ui -o SQBLWidgets/sqblUI/responseTab.py
+	pyuic4 ui/questionGroup.ui -o SQBLWidgets/sqblUI/questionGroup.py
+	pyuic4 ui/questionModule.ui -o SQBLWidgets/sqblUI/questionModule.py
+	pyuic4 ui/questionModuleText.ui -o SQBLWidgets/sqblUI/questionModuleText.py
+	pyuic4 ui/questionText.ui -o SQBLWidgets/sqblUI/questionText.py
+	pyuic4 ui/question.ui -o SQBLWidgets/sqblUI/question.py
+	pyuic4 ui/population.ui -o SQBLWidgets/sqblUI/population.py
+	pyuic4 ui/statementText.ui -o SQBLWidgets/sqblUI/statementText.py
+	pyuic4 ui/stopModule.ui -o SQBLWidgets/sqblUI/stopModule.py
+	pyuic4 ui/statement.ui -o SQBLWidgets/sqblUI/statement.py
+	pyuic4 ui/subQuestion.ui -o SQBLWidgets/sqblUI/subQuestion.py
+	pyuic4 ui/unsupportedWidget.ui -o SQBLWidgets/sqblUI/unsupportedWidget.py
+	pyuic4 ui/wordSub.ui -o SQBLWidgets/sqblUI/wordSub.py
+
+#x.py: X.ui
+#	pyuic ui/X.ui -o SQBLWidgets/sqblUI/x.py
+
+
+# ICONS
+#icons:
+	#pyrcc4 icons/canard.qrc -o SQBLWidgets/sqblUI/canard_icons.py
+
+prepExe:
+	cp -r icons dist/dist/canard_main/
+	rm    dist/dist/canard_main/icons/Canard_icon.ico
+	cp -r images dist/dist/canard_main/
+	mkdir dist/dist/canard_main/roxy
+	cp -r ../roxy-sqbl-instrument-creator/* dist/dist/canard_main/roxy/
+	mkdir dist/dist/canard_main/sqbl
+	cp -r ../sqbl-schema/Schemas/* dist/dist/canard_main/sqbl/
+	mkdir dist/dist/canard_main/examples
+	cp -r ../sqbl-schema/Tests/* dist/dist/canard_main/examples
+

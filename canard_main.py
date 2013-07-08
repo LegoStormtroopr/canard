@@ -52,6 +52,7 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
 #                self.open(f.read())
 
         self.treeView.clicked.connect(self.setMainView)
+        self.newItemsList.clicked.connect(self.setMainView)
         self.treeView.header().setResizeMode(0,QtGui.QHeaderView.ResizeToContents)
 #        self.treeView.header().setStretchLastSection(False) # Not sure why I added this, so I'll leave it here for a little while. Its a UI thing anyway.
         self.treeView.setAcceptDrops(True)        
@@ -144,6 +145,11 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
             for i in reversed(range(self.centralArea.count())):
                 self.centralArea.itemAt(i).widget().setParent(None)
             import sip
+
+    def showItemHelp(self,selected):
+        a = selected.internalPointer().parent()
+        item = self.newItems.data(selected)
+        # fuck it, i give in, need to know how to call these things, 
 
     def setMainView(self,selected):
         

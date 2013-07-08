@@ -444,7 +444,7 @@ class SQBLModuleTreeItem(TreeItem):
     def canDrag(self):
         #Most SQBL things can be dragged, so define those that can't
         if self.element.tag in (
-               _ns("s","Branch"),
+               #_ns("s","Branch"), These are draggable to make decision tables
                _ns("s","ModuleLogic"),
            ):
             return False
@@ -590,9 +590,13 @@ def newConditionalTree(name,question="QuestionID"):
 
 
 class NewModuleItem(QtGui.QStandardItem):
-    def __init__(self,name,data):
+    def __init__(self,name, helpPath,data):
         QtGui.QStandardItem.__init__(self,name)
         self.setData(data,QtCore.Qt.UserRole)
+        self.helpPath = helpPath
+    
+    def getHelp(self):
+        return self.helpPath
 
 class NewItemsListModel(QtGui.QStandardItemModel):
     def __init__(self):
@@ -609,20 +613,29 @@ class NewItemsListModel(QtGui.QStandardItemModel):
 
         parentItem = self.invisibleRootItem()
         self.numberOfNewItems = 100
+        # List of New items:
+        #   human name, namespace name,
+        #   xpath to the help in the schema,
+        #   new python object 
         newItems = [
                 ("Question",_ns("s","Question"),
+                    "//xs:complexType[@name='QuestionType']",
                     newQuestion("NewQuestion","en")),
                 ("Statement",_ns("s","Statement",),
+                    "//xs:element[@name='Statement']",
                     newStatement("NewStatement")),
                 ("For Loop",_ns("s","ForLoop",),
+                    "//xs:element[@name='ForLoop']",
                     newForLoop("NewForLoop")),
                 ("Conditional Tree",_ns("s","ConditionalTree"),
+                    "//xs:element[@name='ConditionalTree']",
                     newConditionalTree("NewTree")),
                 ("Question Group",_ns("s","QuestionGroup"),
+                    "//xs:element[@name='QuestionGroup']",
                     newQuestionGroup("NewGroup")),
             ]
-        for name,tagname,item in newItems:
-            item = NewModuleItem(name,item)
+        for name,tagname,helpPath,item in newItems:
+            item = NewModuleItem(name,helpPath,item)
             item.setIcon(self.icons.get(tagname,None))
             item.setDragEnabled(True)
             parentItem.appendRow(item)
