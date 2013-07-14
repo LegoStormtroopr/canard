@@ -37,31 +37,21 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox"/>
+      <widget class="QComboBox" name="languages"/>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Use the bulk editor to quickly add and change questions.
-Press enter to move between fields, when pressing enter on the last field a new question is added to the end of the main sequence.</string>
-     </property>
-     <property name="wordWrap">
+    <widget class="QTableWidget" name="questionList">
+     <property name="sortingEnabled">
       <bool>true</bool>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QTableWidget" name="tableWidget">
      <attribute name="horizontalHeaderStretchLastSection">
       <bool>true</bool>
      </attribute>
-     <column>
-      <property name="text">
-       <string> </string>
-      </property>
-     </column>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
      <column>
       <property name="text">
        <string>Name</string>

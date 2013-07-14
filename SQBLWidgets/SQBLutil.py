@@ -55,8 +55,12 @@ class SQBLWidget(QtGui.QWidget):
         self.model.emit(QtCore.SIGNAL('dataChanged()'))
 
 class SQBLWeirdThingWidget(SQBLWidget):
-    def __init__(self,element,model):
+    # langXPath is the prefix for where to search for the langs from
+    #   Above added so we didn't need to duplicate the below stuff for BulkQuestionEditors
+    def __init__(self,element,model,langXPath=""):
         SQBLWidget.__init__(self,element,model)
+        self.langXPathPrefix = langXPath
+
     # lang          - The language we want to change
     # newText       - The new Text for this element
     # parent        - The ETree Element that has the parent object of the TextComponent
@@ -76,8 +80,7 @@ class SQBLWeirdThingWidget(SQBLWidget):
     def configureLanguages(self,comboWidget,initialLanguage=None,interfaceLanguage="en"):
         cw = comboWidget #Just cause its easier to refer to
         langs = [] 
-        for t in self.element.xpath(".//s:TextComponent",namespaces=_namespaces):
-            lang = t.get('{%s}lang'%_namespaces["xml"])
+        for lang in self.element.xpath(self.langXPathPrefix+"s:TextComponent/@xml:lang",namespaces=_namespaces):
             if lang is not None and lang not in langs:
                 langName = isoLangCodes.iso639CodeToString(lang)                
                 cw.addItem(langName,lang)

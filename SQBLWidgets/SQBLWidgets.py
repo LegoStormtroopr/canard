@@ -18,6 +18,51 @@ class UnsupportedWidget(SQBLWidget,sqblUI.unsupportedWidget.Ui_Form):
     def __init__(self):
         SQBLWidget.__init__(self,None,None)
 
+class BulkQuestionEditor(SQBLWeirdThingWidget, sqblUI.bulkQuestionEditor.Ui_Form):
+    def __init__(self,element,model):
+        SQBLWeirdThingWidget.__init__(self,element,model,langXPath="//")
+        self.prepQuestionList()
+        self.languages.currentIndexChanged[int].connect(self.updateQuestionList)
+        self.configureLanguages(self.languages)
+        self.questionList.cellChanged.connect(self.updateCell)
+
+    def prepQuestionList(self):
+        rows = len(self.element.xpath("//s:Question",namespaces=_namespaces))
+        self.questionList.setRowCount(rows)
+
+    def updateQuestionList(self,index):
+        lang = "en" #str(self.languages.itemData(index).toPyObject())
+        self.questionList.clearContents()
+        for row,q in enumerate(self.element.xpath("//s:Question",namespaces=_namespaces)):
+            # Set the question name
+            name = q.get("name")
+            idCell = QtGui.QTableWidgetItem(name)
+            idCell.setData(32,name) #Set the name so we can find it again when it changes
+            self.questionList.setItem(row,0,idCell)
+
+    def updateCell(self,row,col):
+        qID = self.questionList.item(row,0).data(32).toPyObject() # Get the original ID in case it changed
+        q = self.element.xpath("//s:Question[@name='%s']"%(qID),namespaces=_namespaces)[0]
+        text = unicode(self.questionList.item(row,col).text())
+        lang = self.languages.itemData(self.languages.currentIndex()).toPyObject()
+
+        if col == 0:
+            # We are changing the ID, so let the model handle this
+            self.model.changeName(qID,text)
+        elif col == 2:
+            # Changing the QuestionText
+            self.updateTextComponent(lang,text,q)
+        else:
+            self.updateTextComponent(lang,text,subQ)
+
+        self.update() 
+
+class ModuleLogic(SQBLNamedWidget, sqblUI.moduleLogic.Ui_Form):
+    def __init__(self,element,model):
+        SQBLWidget.__init__(self,element,model)
+        self.bulkQEditor = BulkQuestionEditor(element,model)
+        self.tabBulkQuestionEditor.layout().addWidget(self.bulkQEditor)
+
 class QuestionGroup(SQBLNamedWidget, sqblUI.questionGroup.Ui_Form):
     def __init__(self,element,model):
         SQBLNamedWidget.__init__(self,element,model,QuestionText)
@@ -134,7 +179,7 @@ class SubQuestion(SQBLWeirdThingWidget, sqblUI.subQuestion.Ui_Form):
 
     def updateSubQuestionList(self,index):
         lang = str(self.languages.itemData(index).toPyObject())
-        self.subQuestionList.clear()
+        self.subQuestionList.clearContents()
         for row,subQ in enumerate(self.element.xpath(".//s:SubQuestions/s:SubQuestion",namespaces=_namespaces)):
             text = subQ.xpath("./s:TextComponent[@xml:lang='%s']" % (lang),namespaces=_namespaces)
             if len(text) > 0:

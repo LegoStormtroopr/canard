@@ -178,6 +178,8 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
             newWidget = SQBLWidgets.WordSub(self.selected,self.model)
         if self.selected.tag == _ns("s","QuestionGroup"):
             newWidget = SQBLWidgets.QuestionGroup(self.selected,self.model)
+        if self.selected.tag == _ns("s","ModuleLogic"):
+            newWidget = SQBLWidgets.ModuleLogic(self.selected,self.model)
         if newWidget is None:
             newWidget = SQBLWidgets.UnsupportedWidget()
         if newWidget is not None:

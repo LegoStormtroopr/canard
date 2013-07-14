@@ -148,6 +148,13 @@ class QuestionModule(QtCore.QAbstractItemModel):
         
         return newparent
 
+    # Change the object with the oldname to the newname
+    def changeName(self,oldname,newname):
+        # TODO: In future this needs to handle renaming all instances where it might be used, but for now... jsut change it.
+        item = self.sqbl.xpath(".//*[@name='%s']"%(oldname),namespaces=_namespaces)
+        if len(item) == 1:
+            item[0].set('name',newname)
+
     def deleteSelected(self):
 #        self.selected.internalPointer.parent().removeChildByName( 
         pass

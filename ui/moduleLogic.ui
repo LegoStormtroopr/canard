@@ -19,10 +19,18 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tabBulkQuestionEditor">
+      <property name="toolTip">
+       <string/>
+      </property>
       <attribute name="title">
        <string>Bulk Question Editor</string>
       </attribute>
+      <attribute name="toolTip">
+       <string>Use the bulk editor to quickly add and change questions.
+Press enter to move between fields, when pressing enter on the last field a new question is added to the end of the main sequence.</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout"/>
      </widget>
     </widget>
    </item>
