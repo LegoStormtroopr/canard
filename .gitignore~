@@ -10,7 +10,7 @@ tmp/
 *.tmp
 *.bak
 *.swp
-*~.nib
+~.nib
 local.properties
 .classpath
 .settings/
@@ -164,5 +164,13 @@ pip-log.txt
 
 # My stuff
 *.pyc
+*~
 # Don't add the compiled UI files
 SQBLWidgets/sqblUI/
+
+# Don't add the symlinked folders
+roxy
+sqbl
+
+#Don't add the cache
+TUSLCache.db

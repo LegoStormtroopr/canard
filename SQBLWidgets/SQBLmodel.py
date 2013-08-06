@@ -92,7 +92,7 @@ class QuestionModule(QtCore.QAbstractItemModel):
                 ws,
                 module,
                 label=u"Word Substitutions",
-                icon=QtGui.QIcon("icons/Populations.png")
+                icon=QtGui.QIcon("icons/WordSubs.png")
                 )
         module.appendChild(wordSubs)
         for sub in ws.iterchildren(tag=_ns('s','WordSub')):
