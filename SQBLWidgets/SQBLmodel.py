@@ -37,6 +37,9 @@ class QuestionModule(QtCore.QAbstractItemModel):
     def setSelected(self,selected):
         self.selected = selected
 
+    def totalChildren(self):
+        return self.rootItem.totalChildren()
+
     def getSelected(self):
         return self.selected
 
@@ -359,56 +362,60 @@ class QuestionModule(QtCore.QAbstractItemModel):
 
 
 class TreeItem(object):  
-      def __init__(self, data, parent=None,drop=False,icon=None,iconSize=0):  
-          self.parentItem = parent  
-          self.itemData = data  
-          self.childItems = []  
-          self.drop=False
-          self.icon=icon
-          self.iconSize=iconSize
+    def __init__(self, data, parent=None,drop=False,icon=None,iconSize=0):  
+        self.parentItem = parent  
+        self.itemData = data  
+        self.childItems = []  
+        self.drop=False
+        self.icon=icon
+        self.iconSize=iconSize
 
-      def getIcon(self):
-          return self.icon
-    
-      def appendChild(self, item):  
-          self.childItems.append(item)  
-    
-      def removeChild(self,item):
-          self.childItems.pop(self.childItems.index(item))
+    def getIcon(self):
+        return self.icon
+  
+    def appendChild(self, item):  
+        self.childItems.append(item)  
+  
+    def removeChild(self,item):
+        self.childItems.pop(self.childItems.index(item))
 
-      def child(self, row):  
-          return self.childItems[row]  
-    
-      def childCount(self):  
-          return len(self.childItems)  
-    
-      def columnCount(self):  
-          return len(self.itemData)  
-    
-      def data(self, column):  
-          try:  
-              return self.itemData  
-   
-          except IndexError:  
-              return None  
-    
-      def parent(self):  
-          return self.parentItem  
-    
-      def row(self):  
-          if self.parentItem:  
-              return self.parentItem.childItems.index(self)  
-    
-          return 0  
-      def setData(self, data):  
-          self.itemData = data
+    def child(self, row):  
+        return self.childItems[row]  
+  
+    def totalChildren(self):
+        children = sum([child.totalChildren() for child in self.childItems])
+        return self.childCount() + children
 
-      def canDrop(self):
-          return self.drop
-      def canDrag(self):
-          return False
-      def getElement(self):  
-          return None
+    def childCount(self):  
+        return len(self.childItems)  
+  
+    def columnCount(self):  
+        return len(self.itemData)  
+  
+    def data(self, column):  
+        try:  
+            return self.itemData  
+ 
+        except IndexError:  
+            return None  
+  
+    def parent(self):  
+        return self.parentItem  
+  
+    def row(self):  
+        if self.parentItem:  
+            return self.parentItem.childItems.index(self)  
+  
+        return 0  
+    def setData(self, data):  
+        self.itemData = data
+
+    def canDrop(self):
+        return self.drop
+    def canDrag(self):
+        return False
+    def getElement(self):  
+        return None
 
 class SQBLModuleTreeItem(TreeItem):  
 

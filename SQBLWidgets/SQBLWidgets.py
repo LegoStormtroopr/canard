@@ -12,7 +12,6 @@ import ResponseObjects as Responses
 import SQBLutil
 import languagePicker
 
-
 # If we don't have interfaces and such, lets just show a very unhelpful error message :/
 class UnsupportedWidget(SQBLWidget,sqblUI.unsupportedWidget.Ui_Form):
     def __init__(self):
@@ -25,13 +24,15 @@ class BulkQuestionEditor(SQBLWeirdThingWidget, sqblUI.bulkQuestionEditor.Ui_Form
         self.languages.currentIndexChanged[int].connect(self.updateQuestionList)
         self.configureLanguages(self.languages)
         self.questionList.cellChanged.connect(self.updateCell)
+        self.addAction(self.actionAddQuestion)
+        self.questionList.cycleFromLastCell.connect(self.newQuestion)
 
     def prepQuestionList(self):
         rows = len(self.element.xpath("//s:Question",namespaces=_namespaces))
         self.questionList.setRowCount(rows)
 
     def updateQuestionList(self,index):
-        lang = "en" #str(self.languages.itemData(index).toPyObject())
+        lang = str(self.languages.itemData(index).toPyObject())
         self.questionList.clearContents()
         for row,q in enumerate(self.element.xpath("//s:Question",namespaces=_namespaces)):
             # Set the question name
@@ -39,6 +40,46 @@ class BulkQuestionEditor(SQBLWeirdThingWidget, sqblUI.bulkQuestionEditor.Ui_Form
             idCell = QtGui.QTableWidgetItem(name)
             idCell.setData(32,name) #Set the name so we can find it again when it changes
             self.questionList.setItem(row,0,idCell)
+
+            text = q.xpath("./s:TextComponent[@xml:lang='%s']/s:QuestionText" % (lang),namespaces=_namespaces)
+            if len(text) > 0:
+                text = text[0].text
+            else:
+                text = "" 
+            combo = QtGui.QComboBox(self)
+
+            # Allowed responses for the combo box
+            allowedResponses = ['Text','Number','CodeList']
+            possibleReponseOptions = allowedResponses 
+            option = 'Unknown' # The final option to select
+
+            # Actual responses in the question
+            responses = q.xpath("s:ResponseType/*",namespaces=_namespaces) 
+            if len(responses) > 1:
+                # Its got a multiple mixed responses, lets not let the user ruin that
+                possibleReponseOptions += ['Mixed'] 
+                option = 'Mixed'
+                combo.setEnabled(False) 
+                combo.setToolTip("Locked, for your protection")
+            else:
+                responseTag = responses[0].tag.split('}',1)[1] # Get just the tag name
+                if responseTag in allowedResponses:
+                    # Its probably ok to let the user change these.
+                    option = responseTag
+            if option == 'Unknown':
+                # We don't know what type it is, set it to unknown and lock it
+                possibleReponseOptions += ['Unknown'] 
+                combo.setEnabled(False) 
+                combo.setToolTip("Locked, for your protection")
+                
+            for response in possibleReponseOptions:
+                combo.addItem(response)
+            combo.setCurrentIndex(possibleReponseOptions.index(option))
+            self.questionList.setCellWidget(row,1,combo)
+            self.questionList.setItem(row,2,QtGui.QTableWidgetItem(text))
+
+    def newQuestion(self):
+        print 'hello'
 
     def updateCell(self,row,col):
         qID = self.questionList.item(row,0).data(32).toPyObject() # Get the original ID in case it changed
@@ -53,7 +94,8 @@ class BulkQuestionEditor(SQBLWeirdThingWidget, sqblUI.bulkQuestionEditor.Ui_Form
             # Changing the QuestionText
             self.updateTextComponent(lang,text,q)
         else:
-            self.updateTextComponent(lang,text,subQ)
+            pass
+            #self.updateTextComponent(lang,text,subQ)
 
         self.update() 
 

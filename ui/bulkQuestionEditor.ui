@@ -42,7 +42,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QTableWidget" name="questionList">
+    <widget class="ReturnSupportedTableWidget" name="questionList">
      <property name="sortingEnabled">
       <bool>true</bool>
      </property>
@@ -70,7 +70,22 @@
     </widget>
    </item>
   </layout>
+  <action name="actionAddQuestion">
+   <property name="text">
+    <string>Add Question</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A, Ctrl+Shift+J</string>
+   </property>
+  </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ReturnSupportedTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header>canardCustomQtWidgets.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

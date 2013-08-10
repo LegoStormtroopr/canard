@@ -10,6 +10,7 @@ import Canard_settings as settings
 from SQBLWidgets.SQBLmodel import _ns
 
 VERSION = "0.0.1B"
+CRITICAL_SIZE = 50
 
 _APPWINDOWTITLE = "Canard Question Module Editor"
 
@@ -72,6 +73,7 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         self.actionSave.triggered.connect(self.saveFile)
         self.actionSaveAs.triggered.connect(self.saveFileAs)
         self.PreviewRefresh.clicked.connect(self.refreshPreview)
+        self.PreviewRefresh.clicked.connect(self.updateFlowchart)
         self.copyImage.clicked.connect(self.copyFlowChartImage)
         #self.actionXXX.triggered.connect(self.YYY)
 
@@ -244,11 +246,17 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
             self.connect(self.model, QtCore.SIGNAL('dataChanged()'), self.updateTitle)
             self.connect(self.model, QtCore.SIGNAL('dataChanged()'), self.thingsChanged)
             self.connect(self.model, QtCore.SIGNAL('layoutChanged()'), self.thingsChanged)
-            self.connect(self.model, QtCore.SIGNAL('layoutChanged()'), self.updateFlowchart)
+            self.connect(self.model, QtCore.SIGNAL('layoutChanged()'), self.requestFlowchartUpdate)
             self.model.emit(QtCore.SIGNAL('layoutChanged()'))
             self.treeView.expandToDepth(1)
             self.treeView.resizeColumnToContents(0)
             self.treeView.header().setResizeMode(0,QtGui.QHeaderView.Stretch | QtGui.QHeaderView.ResizeToContents)
+
+            if self.model.totalChildren() > CRITICAL_SIZE :
+                QtGui.QMessageBox.critical(self,
+                "The size of this Question Module is too big.",
+                "This model is too large for automatic refreshes of the previewer.\nYou can still manually update the flowchart and webpage preview, but it may take some time."
+                        )
 
         except etree.DocumentInvalid as e:
             QtGui.QMessageBox.critical(self,
@@ -306,6 +314,12 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
         else:
             event.ignore()            
 
+    def requestFlowchartUpdate(self):
+        x = self.model.totalChildren()
+        # if the model is too big don't allow automatic updates
+        if x > CRITICAL_SIZE: return
+        self.updateFlowchart()
+        
     def updateFlowchart(self):
         from lxml import etree
         import tempfile
