@@ -12,6 +12,22 @@ import ResponseObjects as Responses
 import SQBLutil
 import languagePicker
 
+# Returns all text and nodes under a given element with normalised spaces.
+def getText(tag):
+    import re
+    from lxml import objectify
+    from copy import deepcopy
+    tag = deepcopy(tag)
+    text = tag.text
+    for e in tag:
+        objectify.deannotate(e)
+        etree.cleanup_namespaces(e)
+        text +=  etree.tostring(e)
+    text = text.strip()
+    text = re.sub(r'xmlns=([\'"]).*?\1', ' ', text) # We don't need the namespace in the text editor
+    text = re.sub(r'\s+', ' ', text)
+    return text
+
 # If we don't have interfaces and such, lets just show a very unhelpful error message :/
 class UnsupportedWidget(SQBLWidget,sqblUI.unsupportedWidget.Ui_Form):
     def __init__(self):
@@ -43,7 +59,7 @@ class BulkQuestionEditor(SQBLWeirdThingWidget, sqblUI.bulkQuestionEditor.Ui_Form
 
             text = q.xpath("./s:TextComponent[@xml:lang='%s']/s:QuestionText" % (lang),namespaces=_namespaces)
             if len(text) > 0:
-                text = text[0].text
+                text = getText(text[0])
             else:
                 text = "" 
             combo = QtGui.QComboBox(self)
@@ -92,7 +108,8 @@ class BulkQuestionEditor(SQBLWeirdThingWidget, sqblUI.bulkQuestionEditor.Ui_Form
             self.model.changeName(qID,text)
         elif col == 2:
             # Changing the QuestionText
-            self.updateTextComponent(lang,text,q)
+            print lang
+            self.updateTextComponent(lang,text,q,textType="QuestionText")
         else:
             pass
             #self.updateTextComponent(lang,text,subQ)
@@ -953,19 +970,15 @@ class SQBLTextComponentObject(SQBLWidget):
         text = ""
         elem = self.element.xpath("./s:%s" % tagname,namespaces=_namespaces)
         if richtext and len(elem) > 0:
-            text = elem[0].text
-            if text is None:
-                text = ""
-            for i in elem[0].iterchildren():
-                text = text + etree.tostring(i)
-            UiField.insertHtml(text)
+            text = getText(elem[0])
+            UiField.insertPlainText(text)
             index = self.verticalLayout.indexOf(UiField)
             self.richtextToolbars[tagname] = RichTextToolBar()
             self.verticalLayout.insertWidget(index,self.richtextToolbars[tagname])
             self.verticalLayout.update()
         else:
             if len(elem) > 0:
-                text = elem[0].text
+                text = getText(elem[0])
             if text is None:
                 text = ""
             UiField.setText(text)

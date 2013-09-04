@@ -64,7 +64,8 @@ class SQBLWeirdThingWidget(SQBLWidget):
     # lang          - The language we want to change
     # newText       - The new Text for this element
     # parent        - The ETree Element that has the parent object of the TextComponent
-    def updateTextComponent(self,lang,newText,parent):
+    # textType      - The child element to update. If none, assumes the TextComponent is a simple textual field with no children
+    def updateTextComponent(self,lang,newText,parent,textType=None):
         if lang is not None:
             lang = str(lang)
             elem = parent.xpath("s:TextComponent[@xml:lang='%s']"%(lang),namespaces=_namespaces)
@@ -74,7 +75,16 @@ class SQBLWeirdThingWidget(SQBLWidget):
                 elem = etree.Element(_ns("s",'TextComponent'))
                 elem.set("{%s}lang"%_namespaces['xml'],lang)
                 parent.append(elem)
-            elem.text = unicode(newText)
+            if textType is None:
+                elem.text = unicode(newText)
+            else:
+                field = elem.xpath("s:%s"%(textType),namespaces=_namespaces)
+                if len(field) > 0:
+                    field = field[0]
+                else:
+                    field = etree.Element(_ns("s",textType))
+                    elem.append(field)
+                field.text = unicode(newText)
             self.update()
 
     def configureLanguages(self,comboWidget,initialLanguage=None,interfaceLanguage="en"):
