@@ -12,22 +12,6 @@ import ResponseObjects as Responses
 import SQBLutil
 import languagePicker
 
-# Returns all text and nodes under a given element with normalised spaces.
-def getText(tag):
-    import re
-    from lxml import objectify
-    from copy import deepcopy
-    tag = deepcopy(tag)
-    text = tag.text
-    for e in tag:
-        objectify.deannotate(e)
-        etree.cleanup_namespaces(e)
-        text +=  etree.tostring(e)
-    text = text.strip()
-    text = re.sub(r'xmlns=([\'"]).*?\1', ' ', text) # We don't need the namespace in the text editor
-    text = re.sub(r'\s+', ' ', text)
-    return text
-
 # If we don't have interfaces and such, lets just show a very unhelpful error message :/
 class UnsupportedWidget(SQBLWidget,sqblUI.unsupportedWidget.Ui_Form):
     def __init__(self):
@@ -59,7 +43,7 @@ class BulkQuestionEditor(SQBLWeirdThingWidget, sqblUI.bulkQuestionEditor.Ui_Form
 
             text = q.xpath("./s:TextComponent[@xml:lang='%s']/s:QuestionText" % (lang),namespaces=_namespaces)
             if len(text) > 0:
-                text = getText(text[0])
+                text = SQBLutil.getRichTextAsMarkup(text[0])
             else:
                 text = "" 
             combo = QtGui.QComboBox(self)
@@ -944,9 +928,9 @@ class SQBLTextComponentObject(SQBLWidget):
                
                 elem = etree.Element(_ns("s",tagname))
                 self.element.append(elem)
-
+            
             #For now, richtext is "too hard"
-            if not richtext or True:
+            if not richtext:
                 try:
                     # Is this a QLineEdit?
                     elem.text = unicode(UiField.text())
@@ -957,20 +941,44 @@ class SQBLTextComponentObject(SQBLWidget):
                     # Oh, it isn't well, better fail then.
                     raise 
             else:
-                rt = unicode(UiField.toHtml())
-                rt.replace('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">',"")
-                xml = etree.fromstring(rt)
-                elem.clear()
-                for p in xml.xpath("//body/p"):
-                    p.attrib.pop('style')
-                    elem.append(p)
+                pos = UiField.cursorRect(UiField.textCursor()).topLeft()
+                pos = UiField.mapToGlobal(pos)
+                try:
+                    root = etree.fromstring("<x xmlns='sqbl:1'>"+unicode(UiField.toPlainText())+"</x>")
+                    QtGui.QToolTip.hideText()
+                    elem.text = root.text
+                    for e in elem:
+                        elem.remove(e)
+                    for e in root:
+                        elem.append(e)
+
+                except etree.XMLSyntaxError, e:
+                    msg = e.error_log.last_error.message
+                    line=e.error_log.last_error.line
+                    col=e.error_log.last_error.column
+                    ttText = "Invalid XML: Line %s, Col %s\n %s"%(line,col,msg)
+                    #print ttText
+                    QtGui.QToolTip.showText(pos,ttText)
+                    elem.text = unicode(UiField.toPlainText())
+                    for e in elem:
+                        elem.remove(e)
+                except:
+                    QtGui.QToolTip.showText(pos,"Invalid XML: Unknown error")
+                    raise
+                #rt = unicode(UiField.toHtml())
+                #rt.replace('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">',"")
+                #xml = etree.fromstring(rt)
+                #elem.clear()
+                #for p in xml.xpath("//body/p"):
+                #    p.attrib.pop('style')
+                #    elem.append(p)
                 #elem.text = str(UiField.toHtml())
             self.update()
 
         text = ""
         elem = self.element.xpath("./s:%s" % tagname,namespaces=_namespaces)
         if richtext and len(elem) > 0:
-            text = getText(elem[0])
+            text = SQBLutil.getRichTextAsMarkup(elem[0])
             UiField.insertPlainText(text)
             index = self.verticalLayout.indexOf(UiField)
             self.richtextToolbars[tagname] = RichTextToolBar()
@@ -978,7 +986,7 @@ class SQBLTextComponentObject(SQBLWidget):
             self.verticalLayout.update()
         else:
             if len(elem) > 0:
-                text = getText(elem[0])
+                text = SQBLutil.getRichTextAsMarkup(elem[0])
             if text is None:
                 text = ""
             UiField.setText(text)

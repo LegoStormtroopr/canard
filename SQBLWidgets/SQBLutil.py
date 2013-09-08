@@ -40,6 +40,26 @@ def comparisonMap(tag):
     # You gave us a bad thing and there is no mapping. This could be an exception, but I'll let it slide for now.
     return None
 
+# Returns all text and nodes under a given element with normalised spaces.
+def getRichTextAsMarkup(tag):
+    import re
+    from lxml import objectify
+    from copy import deepcopy
+    tag = deepcopy(tag)
+    text = tag.text
+    if text is None:
+        text = ""
+    for e in tag:
+        objectify.deannotate(e)
+        etree.cleanup_namespaces(e)
+        print etree.tostring(e)
+        text += etree.tostring(e)
+    text = text.strip()
+    print text
+    text = re.sub(r'xmlns=([\'"]).*?\1', ' ', text) # We don't need the namespace in the text editor
+    text = re.sub(r'\s+', ' ', text)
+    return text
+
 class SQBLWidget(QtGui.QWidget):
     def __init__(self,element,model):
         QtGui.QWidget.__init__(self)
