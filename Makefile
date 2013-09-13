@@ -42,7 +42,7 @@ widgets:
 
 # ICONS
 #icons:
-	#pyrcc4 icons/canard.qrc -o SQBLWidgets/sqblUI/canard_icons.py
+	pyrcc4 icons/canard.qrc -o SQBLWidgets/sqblUI/canard_rc.py
 
 prepExe:
 	cp -r icons dist/dist/canard_main/

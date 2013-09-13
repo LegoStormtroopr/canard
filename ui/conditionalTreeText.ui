@@ -57,72 +57,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="instructionToolbar">
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Sunken</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QPushButton" name="bold">
-        <property name="maximumSize">
-         <size>
-          <width>25</width>
-          <height>25</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>B</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="italic">
-        <property name="maximumSize">
-         <size>
-          <width>25</width>
-          <height>25</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>I</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="underline">
-        <property name="maximumSize">
-         <size>
-          <width>25</width>
-          <height>25</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>U</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QFontComboBox" name="fontComboBox"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QTextEdit" name="instruction">
      <property name="styleSheet">
       <string notr="true">margin-left:8px;</string>
@@ -132,54 +66,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>fontComboBox</sender>
-   <signal>currentFontChanged(QFont)</signal>
-   <receiver>instruction</receiver>
-   <slot>setCurrentFont(QFont)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>459</x>
-     <y>256</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>259</x>
-     <y>308</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>underline</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>instruction</receiver>
-   <slot>setFontUnderline(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>92</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>109</x>
-     <y>295</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>italic</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>instruction</receiver>
-   <slot>setFontItalic(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>67</x>
-     <y>266</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>67</x>
-     <y>289</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

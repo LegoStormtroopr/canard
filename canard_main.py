@@ -4,8 +4,10 @@ import os, sys, StringIO
 from SQBLWidgets import sqblUI
 from SQBLWidgets import SQBLmodel
 import SQBLWidgets
-
+import ConfigParser
+from lxml import etree
 import Canard_settings as settings
+AppSettings = QtCore.QSettings("sqbl.org", "Canard-App")
 
 from SQBLWidgets.SQBLmodel import _ns
 
@@ -24,7 +26,6 @@ else:
     _INSTALLDIRECTORY = "c:\\Users\\theodore\\Documents\\GitHub\\canard\\"
 
 _INSTALLDIRECTORY = _INSTALLDIRECTORY.replace("\\","/")
-print _INSTALLDIRECTORY
 _baseURL = _INSTALLDIRECTORY+"roxy"
 
 
@@ -79,6 +80,10 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
 
         self.actionRefeshPreviewers.triggered.connect(self.updateFlowchart)
         self.actionRefeshPreviewers.triggered.connect(self.refreshPreview)
+
+        # Connect import/export refreshers
+        self.actionRefreshImport.triggered.connect(self.refreshImportMenu)
+        self.refreshImportMenu()
          
         self.actionBlame.triggered.connect(self.vanityBox)
 
@@ -89,7 +94,11 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         # Get rid of stuff that we've built in the UI, but haven't finished coding
         self.unsupportedFeature(self.webServerDock)
         self.unsupportedFeature(self.dataElementDock)
-        self.unsupportedFeature(self.toolFormat)
+
+        self.restoreGeometry(
+                AppSettings.value("MainWindow/Geometry").toByteArray())
+        #. app's State include Geometries of named toolbars and dockables:
+        self.restoreState(AppSettings.value("MainWindow/State").toByteArray())
 
 
         # Everything is set up, lets make a new file...
@@ -122,6 +131,58 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
 """.format(version=VERSION)
         QtGui.QMessageBox.about(self,"About Virgil UI", vanityText )
 
+    def refreshImportMenu(self):
+        self.refreshAddon("import")
+        addonType="import"
+
+        for name in os.walk('./plugins/%s/'%(addonType)).next()[1]:
+            try:
+                config = ConfigParser.RawConfigParser()
+                config.read('./plugins/%s/%s/plugin.ini'%(addonType,name))
+                title = config.get('SQBL Plugin',"Name")
+                action = QtGui.QAction("%s (%s)"%(title,name), self.menuImport)
+                action.setData('./plugins/%s/%s'%(addonType,name))
+                action.triggered.connect(self.runImporter)
+                self.menuImport.addAction(action)
+            except:
+                #if the plugin folder has no ini file, just ignore it
+                pass
+
+    def runImporter(self):
+        #Thanks to below line for line 584 and on...
+        # http://americiumdream.wordpress.com/cyb-dev/commented-pyqt-code-for-main-windows/
+        action = self.sender()
+        importDir = ""
+        if isinstance(action, QtGui.QAction): #(paranoid sanity check)
+            # the menu item's data is the filename we need:
+            importDir = unicode(action.data().toString())
+        else:
+            return
+        config = ConfigParser.RawConfigParser()
+        config.read('./%s/plugin.ini'%importDir)
+        name = config.get('SQBL Plugin',"Name")
+        filetypes = config.get('SQBL Plugin',"Extensions")
+        bf = config.get('SQBL Plugin',"Base File")
+        extension = bf.rsplit('.',1)[-1].lower()
+        if extension in ['xsl','xslt']:
+            filename = QtGui.QFileDialog.getOpenFileName(
+                    self, 'Import - %s'%name, '.', filetypes
+                    )
+            if not filename:
+                return
+            with open(filename,"r") as f:
+                xml = etree.parse(f)
+            with open("./%s/%s"%(importDir,bf)) as f:
+                parser = etree.XMLParser(recover=True)
+
+                xslt = etree.parse(f,parser)
+                transform = etree.XSLT(xslt)
+
+                out = unicode(transform(xml))
+                self.open(out)
+        
+    def refreshAddon(self,addonType):
+        pass
 
     def unsupportedFeature(self,item):
         item.setVisible(False) # Hides instantly
@@ -311,6 +372,10 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
         safeToClose = self.savedDialog(message="Do you want to save the changes to this document before closing?")
         if safeToClose:
             event.accept()
+            AppSettings.setValue("MainWindow/Geometry", QtCore.QVariant(
+                              self.saveGeometry()))
+            AppSettings.setValue("MainWindow/State", QtCore.QVariant(
+                              self.saveState()))            
         else:
             event.ignore()            
 

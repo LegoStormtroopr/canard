@@ -1,0 +1,19 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>Canard_icon.png</file>
+    <file>Branch.png</file>
+    <file>ConditionalTree.png</file>
+    <file>Derived.png</file>
+    <file>Loop.png</file>
+    <file>Question.png</file>
+    <file>Statement.png</file>
+  </qresource>
+  <qresource prefix="file">
+    <file>actions/view-refresh-4.png</file>
+    <file>actions/network-connect-2.png</file>
+    <file>actions/document-open-5.png</file>
+    <file>actions/document-save-3.png</file>
+    <file>actions/document-save-as-3.png</file>
+    <file>actions/document-new-3.png</file>
+  </qresource>
+</RCC>
