@@ -84,6 +84,8 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         # Connect import/export refreshers
         self.actionRefreshImport.triggered.connect(self.refreshImportMenu)
         self.refreshImportMenu()
+        self.actionRefreshExport.triggered.connect(self.refreshExportMenu)
+        self.refreshExportMenu()
          
         self.actionBlame.triggered.connect(self.vanityBox)
 
@@ -94,6 +96,9 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         # Get rid of stuff that we've built in the UI, but haven't finished coding
         self.unsupportedFeature(self.webServerDock)
         self.unsupportedFeature(self.dataElementDock)
+        self.unsupportedFeature(self.actionRefreshImport)
+        self.unsupportedFeature(self.actionRefreshExport)
+        self.unsupportedFeature(self.menuSettings)
 
         self.restoreGeometry(
                 AppSettings.value("MainWindow/Geometry").toByteArray())
@@ -132,23 +137,30 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
         QtGui.QMessageBox.about(self,"About Virgil UI", vanityText )
 
     def refreshImportMenu(self):
-        self.refreshAddon("import")
-        addonType="import"
+        self.refreshPluginMenu("import", self.menuImport)
 
-        for name in os.walk('./plugins/%s/'%(addonType)).next()[1]:
+    def refreshExportMenu(self):
+        self.refreshPluginMenu("export", self.menuExport)
+
+
+    def refreshPluginMenu(self,pluginType,menu):
+        for name in os.walk('./plugins/%s/'%(pluginType)).next()[1]:
             try:
                 config = ConfigParser.RawConfigParser()
-                config.read('./plugins/%s/%s/plugin.ini'%(addonType,name))
+                config.read('./plugins/%s/%s/plugin.ini'%(pluginType,name))
                 title = config.get('SQBL Plugin',"Name")
+                runType = config.get('SQBL Plugin',"Type").lower()
+                if runType not in ["import","export"]:
+                    return #not an importer or exporter, so bail.
                 action = QtGui.QAction("%s (%s)"%(title,name), self.menuImport)
-                action.setData('./plugins/%s/%s'%(addonType,name))
-                action.triggered.connect(self.runImporter)
-                self.menuImport.addAction(action)
+                action.setData('./plugins/%s/%s'%(pluginType,name))
+                action.triggered.connect(self.runImportExport)
+                menu.addAction(action)
             except:
                 #if the plugin folder has no ini file, just ignore it
                 pass
 
-    def runImporter(self):
+    def runImportExport(self):
         #Thanks to below line for line 584 and on...
         # http://americiumdream.wordpress.com/cyb-dev/commented-pyqt-code-for-main-windows/
         action = self.sender()
@@ -164,25 +176,35 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
         filetypes = config.get('SQBL Plugin',"Extensions")
         bf = config.get('SQBL Plugin',"Base File")
         extension = bf.rsplit('.',1)[-1].lower()
+        runType = config.get('SQBL Plugin',"Type").lower()
+        if runType not in ["import","export"]:
+            return #not an importer or exporter, so bail. TODO: Maybe an error?
         if extension in ['xsl','xslt']:
-            filename = QtGui.QFileDialog.getOpenFileName(
+            if runType == "import":
+                filename = QtGui.QFileDialog.getOpenFileName(
                     self, 'Import - %s'%name, '.', filetypes
                     )
+            elif runType == "export":
+                filename = QtGui.QFileDialog.getSaveFileName(
+                    self, 'Export - %s'%name, '.', filetypes
+                    )
             if not filename:
-                return
-            with open(filename,"r") as f:
-                xml = etree.parse(f)
+                return #User hit cancel, so bail
+            if runType == "import":
+                with open(filename,"r") as f:
+                    xml = etree.parse(f)
+            elif runType == "export":
+                xml = etree.fromstring(self.model.getXMLstring())
             with open("./%s/%s"%(importDir,bf)) as f:
                 parser = etree.XMLParser(recover=True)
-
                 xslt = etree.parse(f,parser)
                 transform = etree.XSLT(xslt)
-
                 out = unicode(transform(xml))
+            if runType == "import":
                 self.open(out)
-        
-    def refreshAddon(self,addonType):
-        pass
+            elif runType == "export":
+                with open(filename,"w") as f:
+                    f.write(out)
 
     def unsupportedFeature(self,item):
         item.setVisible(False) # Hides instantly

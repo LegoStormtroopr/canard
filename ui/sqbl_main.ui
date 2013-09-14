@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>911</width>
-    <height>604</height>
+    <height>613</height>
    </rect>
   </property>
   <property name="font">
@@ -633,14 +633,14 @@ QDockWidget &gt; * {
     </property>
     <addaction name="actionBlame"/>
    </widget>
-   <widget class="QMenu" name="menu_Settings">
+   <widget class="QMenu" name="menuSettings">
     <property name="title">
      <string>&amp;Settings</string>
     </property>
     <addaction name="actionPlugins"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menu_Settings"/>
+   <addaction name="menuSettings"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionNewModule">
