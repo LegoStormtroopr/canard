@@ -49,7 +49,7 @@ class BulkQuestionEditor(SQBLWeirdThingWidget, sqblUI.bulkQuestionEditor.Ui_Form
             combo = QtGui.QComboBox(self)
 
             # Allowed responses for the combo box
-            allowedResponses = ['Text','Number','CodeList']
+            allowedResponses = SQBLutil.responseTypes
             possibleReponseOptions = allowedResponses 
             option = 'Unknown' # The final option to select
 
@@ -79,7 +79,8 @@ class BulkQuestionEditor(SQBLWeirdThingWidget, sqblUI.bulkQuestionEditor.Ui_Form
             self.questionList.setItem(row,2,QtGui.QTableWidgetItem(text))
 
     def newQuestion(self):
-        print 'hello'
+        # TODO: When a user hits enter in the last question we should add a new one easily
+        pass
 
     def updateCell(self,row,col):
         qID = self.questionList.item(row,0).data(32).toPyObject() # Get the original ID in case it changed
@@ -88,11 +89,13 @@ class BulkQuestionEditor(SQBLWeirdThingWidget, sqblUI.bulkQuestionEditor.Ui_Form
         lang = self.languages.itemData(self.languages.currentIndex()).toPyObject()
 
         if col == 0:
-            # We are changing the ID, so let the model handle this
+            # Changing the ID, so let the model handle this
             self.model.changeName(qID,text)
+        if col == 0:
+            # Changing the response type
+            pass
         elif col == 2:
             # Changing the QuestionText
-            print lang
             self.updateTextComponent(lang,text,q,textType="QuestionText")
         else:
             pass
@@ -257,7 +260,7 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
         self.subQuestionPane = SubQuestion(self.element,model)
         self.subQuestionsTab.layout().addWidget(self.subQuestionPane)
 
-        responseTypes = ["Text","Number", "Code list"]
+        responseTypes = SQBLutil.responseTypes
         self.responses = self.element.xpath("./s:ResponseType",namespaces=_namespaces)[0]
         #self.responseType.addItems(responseTypes)
 
@@ -1066,15 +1069,16 @@ class RichTextToolBar(QtGui.QWidget):
         self.fontComboBox = QtGui.QFontComboBox(self.frame)
         self.horizontalLayout.addWidget(self.fontComboBox)
 
-class WordSub(SQBLWeirdThingWidget, sqblUI.wordSub.Ui_Form):
+class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
     def __init__(self,element,model):
-        SQBLWeirdThingWidget.__init__(self,element,model)
+        SQBLNamedWidget.__init__(self,element,model,WordSubText)
 
-        self.connectAddRemoveLanguages(self.addLanguage,self.removeLanguage,self.languages)
-        self.configureLanguages(self.languages)
+        self.updateDecisionTable()
+        #self.connectAddRemoveLanguages(self.addLanguage,self.removeLanguage,self.languages)
+        #self.configureLanguages(self.languages)
 
-        self.wordSubText.textChanged.connect(self.updateTagName)
-        self.languages.currentIndexChanged[int].connect(self.updateField)
+        #self.wordSubText.textChanged.connect(self.updateTagName)
+        #self.languages.currentIndexChanged[int].connect(self.updateField)
 
     def updateTagName(self,text):
         lang = self.languages.itemData(self.languages.currentIndex()).toPyObject()
@@ -1090,4 +1094,56 @@ class WordSub(SQBLWeirdThingWidget, sqblUI.wordSub.Ui_Form):
             value = text[0].textText(value)
         self.wordSubText.set
         self.update()
+
+    def updateDecisionTable(self):
+        self.decisionTable.clearContents()
+
+        questions = set()
+        for i in self.element.xpath(".//s:ValueOf",namespaces=_namespaces):
+            questions.add(i.get('question'))
+        questions = list(questions)
+        questions.sort()
+
+        # Add one, cause we need the first column for Branches, this happens a few times
+        self.decisionTable.setColumnCount(len(questions)+1)
+        # Ad
+        self.decisionTable.setRowCount(max(len(self.element.xpath("./s:Condition",namespaces=_namespaces)),1))
+        #self.decisionTable.setVerticalHeaderItem(0,QtGui.QTableWidgetItem("Branch"))
+        if len(self.element.xpath("./s:Condition",namespaces=_namespaces)) == 0:
+            self.decisionTable.setHorizontalHeaderItem(0,QtGui.QTableWidgetItem("0"))
+        for i,q in enumerate(questions):
+            self.decisionTable.setVerticalHeaderItem(i+1,QtGui.QTableWidgetItem(q+" "))
+
+        for row, rule in enumerate(self.element.xpath("./s:Condition",namespaces=_namespaces)):
+            selected = rule.get('resultBranch')
+            #widget = self.decisionTable.makeBranchSelectCell(selected)
+
+            self.decisionTable.setCellWidget(0,col,widget)
+            for col,q in enumerate(questions):
+                col = col + 0  #Because of the first branch column
+                val = rule.xpath("./s:ValueOf[@question='%s']"%q,namespaces=_namespaces)
+                if len(val)>0:
+                    #There should only be one condition for this question in this set
+                    text = val[0].text
+                    cond = val[0].get('is')
+                else:
+                    # If there is no condition for this pair
+                    text = ""
+                    cond = None
+                editor = self.decisionTable.makeCellPair(row,col,q,cond,text)
+
+                self.decisionTable.setCellWidget(row,col,editor)
+
+        self.decisionTable.resizeColumnsToContents() 
+
+        # Connects for allowing reordering of Branch columns conditionals
+        self.decisionTable.horizontalHeader().setMovable(True)
+        #self.decisionTable.horizontalHeader().sectionMoved.connect(self.moveColumn)
+
+class WordSubText(SQBLTextComponentObject, sqblUI.wordSubText.Ui_Form):
+    def __init__(self,element,model):
+        SQBLTextComponentObject.__init__(self,element,model)
+        self.connect(self.intentText,"Intent")
+        self.connect(self.defaultText,"Default")
+        self.connect(self.staticText,"Static")
 

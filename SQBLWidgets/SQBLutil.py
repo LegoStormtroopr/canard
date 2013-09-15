@@ -19,6 +19,9 @@ _comparisons = [
         ("matches"  , "match_for"),
          ]
 
+# A list of the currently allowed response types that Canard / SQBL support
+responseTypes = ["Text","Number", "Code list"]
+
 # Validator for valid names of objects
 nameValidator = QtGui.QRegExpValidator(QtCore.QRegExp("[a-zA-Z][a-zA-Z0-9_\-.]*"))
 
@@ -52,10 +55,8 @@ def getRichTextAsMarkup(tag):
     for e in tag:
         objectify.deannotate(e)
         etree.cleanup_namespaces(e)
-        print etree.tostring(e)
         text += etree.tostring(e)
     text = text.strip()
-    print text
     text = re.sub(r'xmlns=([\'"]).*?\1', ' ', text) # We don't need the namespace in the text editor
     text = re.sub(r'\s+', ' ', text)
     return text

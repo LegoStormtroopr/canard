@@ -241,7 +241,11 @@ QDockWidget &gt; * {
         <string>Refresh</string>
        </property>
        <property name="text">
-        <string>↺</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../icons/canard.qrc">
+         <normaloff>:/file/actions/view-refresh-4.png</normaloff>:/file/actions/view-refresh-4.png</iconset>
        </property>
       </widget>
      </item>
@@ -473,7 +477,6 @@ QDockWidget &gt; * {
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
    <addaction name="actionSaveAs"/>
-   <addaction name="actionRefeshPreviewers"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
    <property name="windowTitle">
@@ -508,81 +511,6 @@ QDockWidget &gt; * {
        <property name="alternatingRowColors">
         <bool>true</bool>
        </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="webServerDock">
-   <property name="windowTitle">
-    <string>Web Server</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_6">
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QPushButton" name="toggleWebServer">
-       <property name="text">
-        <string>Start</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QScrollArea" name="scrollArea_3">
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>100</height>
-        </size>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="widgetResizable">
-        <bool>true</bool>
-       </property>
-       <widget class="QWidget" name="scrollAreaWidgetContents_3">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>180</width>
-          <height>69</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
-         <item>
-          <widget class="QLabel" name="serverOutput">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Click start to start the web server...</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
       </widget>
      </item>
     </layout>
@@ -637,11 +565,49 @@ QDockWidget &gt; * {
     <property name="title">
      <string>&amp;Settings</string>
     </property>
+    <addaction name="actionAutoRefreshFlowchart"/>
+    <addaction name="actionAutoRefreshPreviewer"/>
+    <addaction name="separator"/>
     <addaction name="actionPlugins"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSettings"/>
    <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QToolBar" name="toolBarPreviewOptions">
+   <property name="windowTitle">
+    <string>Preview Options</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonIconOnly</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionRefeshPreviewers"/>
+   <addaction name="actionAutoRefreshFlowchart"/>
+   <addaction name="actionAutoRefreshPreviewer"/>
+  </widget>
+  <widget class="QToolBar" name="toolBarRichText">
+   <property name="windowTitle">
+    <string>Rich Text</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionInsertWordsub"/>
   </widget>
   <action name="actionNewModule">
    <property name="icon">
@@ -686,9 +652,6 @@ QDockWidget &gt; * {
    </property>
    <property name="text">
     <string>Save &amp;As</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="actionRefeshPreviewers">
@@ -748,6 +711,48 @@ QDockWidget &gt; * {
    </property>
    <property name="toolTip">
     <string>Plugins</string>
+   </property>
+  </action>
+  <action name="actionAutoRefreshFlowchart">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../icons/canard.qrc">
+     <normaloff>:/file/actions/view-sidetree-3.png</normaloff>:/file/actions/view-sidetree-3.png</iconset>
+   </property>
+   <property name="text">
+    <string>Auto refresh flowchart</string>
+   </property>
+   <property name="toolTip">
+    <string>Auto refresh flowchart</string>
+   </property>
+  </action>
+  <action name="actionAutoRefreshPreviewer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../icons/canard.qrc">
+     <normaloff>:/file/actions/view-right-new-2.png</normaloff>:/file/actions/view-right-new-2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Auto refresh previewer</string>
+   </property>
+   <property name="toolTip">
+    <string>Auto refresh previewer</string>
+   </property>
+  </action>
+  <action name="actionInsertWordsub">
+   <property name="icon">
+    <iconset resource="../icons/canard.qrc">
+     <normaloff>:/file/actions/insert-text-2.png</normaloff>:/file/actions/insert-text-2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Insert Wordsub</string>
+   </property>
+   <property name="toolTip">
+    <string>Insert a &quot;Word subtitution&quot; into the current rich text field</string>
    </property>
   </action>
  </widget>

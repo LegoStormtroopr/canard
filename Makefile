@@ -35,6 +35,7 @@ widgets:
 	pyuic4 ui/subQuestion.ui -o SQBLWidgets/sqblUI/subQuestion.py
 	pyuic4 ui/unsupportedWidget.ui -o SQBLWidgets/sqblUI/unsupportedWidget.py
 	pyuic4 ui/wordSub.ui -o SQBLWidgets/sqblUI/wordSub.py
+	pyuic4 ui/wordSubText.ui -o SQBLWidgets/sqblUI/wordSubText.py
 
 #x.py: X.ui
 #	pyuic ui/X.ui -o SQBLWidgets/sqblUI/x.py

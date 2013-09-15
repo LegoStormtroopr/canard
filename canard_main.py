@@ -11,8 +11,8 @@ AppSettings = QtCore.QSettings("sqbl.org", "Canard-App")
 
 from SQBLWidgets.SQBLmodel import _ns
 
-VERSION = "0.0.1B"
-CRITICAL_SIZE = 50
+VERSION = "0.1.0B"
+CRITICAL_SIZE = 50 # Number of nodes before refreshes get slow.
 
 _APPWINDOWTITLE = "Canard Question Module Editor"
 
@@ -59,6 +59,7 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
 #        self.treeView.header().setStretchLastSection(False) # Not sure why I added this, so I'll leave it here for a little while. Its a UI thing anyway.
         self.treeView.setAcceptDrops(True)        
         self.treeView.header().setStretchLastSection(True)
+        self.safeToRefresh = True
 
         # Subclassing is BULLSHIT
         def keyPressEvent(event,self=self.treeView):
@@ -74,12 +75,16 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         self.actionSave.triggered.connect(self.saveFile)
         self.actionSaveAs.triggered.connect(self.saveFileAs)
         self.PreviewRefresh.clicked.connect(self.refreshPreview)
-        self.PreviewRefresh.clicked.connect(self.updateFlowchart)
         self.copyImage.clicked.connect(self.copyFlowChartImage)
         #self.actionXXX.triggered.connect(self.YYY)
 
         self.actionRefeshPreviewers.triggered.connect(self.updateFlowchart)
         self.actionRefeshPreviewers.triggered.connect(self.refreshPreview)
+        self.actionRefeshPreviewers.triggered.connect(self.refreshPreview)
+
+        self.autoFlowchartRefresh = True
+        self.actionAutoRefreshFlowchart.toggled.connect(self.setAutoFlowchartRefresh)
+        self.actionAutoRefreshFlowchart.setChecked(self.autoFlowchartRefresh)
 
         # Connect import/export refreshers
         self.actionRefreshImport.triggered.connect(self.refreshImportMenu)
@@ -94,11 +99,12 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         self.setWindowIcon(QtGui.QIcon("icons/Canard.png"))
 
         # Get rid of stuff that we've built in the UI, but haven't finished coding
-        self.unsupportedFeature(self.webServerDock)
         self.unsupportedFeature(self.dataElementDock)
         self.unsupportedFeature(self.actionRefreshImport)
         self.unsupportedFeature(self.actionRefreshExport)
         self.unsupportedFeature(self.menuSettings)
+        self.unsupportedFeature(self.actionAutoRefreshPreviewer)
+        self.unsupportedFeature(self.toolBarRichText)
 
         self.restoreGeometry(
                 AppSettings.value("MainWindow/Geometry").toByteArray())
@@ -209,6 +215,22 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
     def unsupportedFeature(self,item):
         item.setVisible(False) # Hides instantly
         item.deleteLater()     # Deletes after a small delay
+
+    def setAutoFlowchartRefresh(self,state):
+        state = True if state is True else False
+        print state
+        self.autoFlowchartRefresh = state
+
+    def setSafeAutoFlowchartRefresh(self,state):
+        msg = ""
+        if state is not True:
+            state = False # Just to be sure
+            msg = "\n(Disabled due to document size)   "
+        self.safeToRefresh = state
+        self.actionAutoRefreshFlowchart.setEnabled(state)
+        self.actionAutoRefreshFlowchart.setToolTip(
+            str(self.actionAutoRefreshFlowchart.text()+msg)
+          )
 
 
     def copyFlowChartImage(self):
@@ -340,6 +362,7 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
                 "The size of this Question Module is too big.",
                 "This model is too large for automatic refreshes of the previewer.\nYou can still manually update the flowchart and webpage preview, but it may take some time."
                         )
+                self.setSafeAutoFlowchartRefresh(False)
 
         except etree.DocumentInvalid as e:
             QtGui.QMessageBox.critical(self,
@@ -405,6 +428,8 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
         x = self.model.totalChildren()
         # if the model is too big don't allow automatic updates
         if x > CRITICAL_SIZE: return
+        print self.autoFlowchartRefresh
+        if not self.autoFlowchartRefresh: return
         self.updateFlowchart()
         
     def updateFlowchart(self):

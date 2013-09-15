@@ -9,6 +9,9 @@
     <file>Statement.png</file>
   </qresource>
   <qresource prefix="file">
+    <file>actions/insert-text-2.png</file>
+    <file>actions/view-right-new-2.png</file>
+    <file>actions/view-sidetree-3.png</file>
     <file>actions/view-refresh-4.png</file>
     <file>actions/network-connect-2.png</file>
     <file>actions/document-open-5.png</file>
