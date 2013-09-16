@@ -14,7 +14,39 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="3">
+   <item row="4" column="1" colspan="2">
+    <layout class="QHBoxLayout" name="DTLayout"/>
+   </item>
+   <item row="5" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLineEdit" name="name">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
     <widget class="QLabel" name="label_5">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -48,36 +80,7 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="3">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="0" column="3">
-    <widget class="QLineEdit" name="name">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2" colspan="2">
+   <item row="3" column="1" colspan="2">
     <widget class="QLabel" name="label">
      <property name="styleSheet">
       <string notr="true">* {font-size:8pt; }</string>
@@ -93,10 +96,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="2" colspan="2">
-    <widget class="QTableWidget" name="decisionTable"/>
-   </item>
-   <item row="2" column="0" colspan="4">
+   <item row="2" column="0" colspan="3">
     <widget class="QWidget" name="textTab" native="true">
      <layout class="QVBoxLayout" name="verticalLayout"/>
     </widget>

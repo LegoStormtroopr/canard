@@ -129,7 +129,7 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
 </p>
 <p>
 <br>Released under GPLv3 Licence<br>
-Details available at: <a href="http://code.google.com/p/virgil-ui/">GitHub<a>
+Details available at: <a href="http://github.com/LegoStormtroopr/canard">GitHub<a>
 </p>
 <p>
 Read more about <a href="http://sqbl.org">SQBL</a> for more information on how Canard stores and manages questionnaire specifications.

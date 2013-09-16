@@ -1073,6 +1073,10 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
     def __init__(self,element,model):
         SQBLNamedWidget.__init__(self,element,model,WordSubText)
 
+        dt = DecisionTable(1,1,self)
+        self.DTLayout.addWidget(dt)
+        self.decisionTable = dt
+
         self.updateDecisionTable()
         #self.connectAddRemoveLanguages(self.addLanguage,self.removeLanguage,self.languages)
         #self.configureLanguages(self.languages)
@@ -1105,22 +1109,18 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
         questions.sort()
 
         # Add one, cause we need the first column for Branches, this happens a few times
-        self.decisionTable.setColumnCount(len(questions)+1)
+        self.decisionTable.setRowCount(len(questions)+1)
         # Ad
-        self.decisionTable.setRowCount(max(len(self.element.xpath("./s:Condition",namespaces=_namespaces)),1))
-        #self.decisionTable.setVerticalHeaderItem(0,QtGui.QTableWidgetItem("Branch"))
+        self.decisionTable.setColumnCount(max(len(self.element.xpath("./s:Condition",namespaces=_namespaces)),1))
         if len(self.element.xpath("./s:Condition",namespaces=_namespaces)) == 0:
-            self.decisionTable.setHorizontalHeaderItem(0,QtGui.QTableWidgetItem("0"))
+            self.decisionTable.setVerticalHeaderItem(0,QtGui.QTableWidgetItem("0"))
         for i,q in enumerate(questions):
-            self.decisionTable.setVerticalHeaderItem(i+1,QtGui.QTableWidgetItem(q+" "))
+            self.decisionTable.setHorizontalHeaderItem(i,QtGui.QTableWidgetItem(q+" "))
 
         for row, rule in enumerate(self.element.xpath("./s:Condition",namespaces=_namespaces)):
-            selected = rule.get('resultBranch')
             #widget = self.decisionTable.makeBranchSelectCell(selected)
 
-            self.decisionTable.setCellWidget(0,col,widget)
             for col,q in enumerate(questions):
-                col = col + 0  #Because of the first branch column
                 val = rule.xpath("./s:ValueOf[@question='%s']"%q,namespaces=_namespaces)
                 if len(val)>0:
                     #There should only be one condition for this question in this set
@@ -1133,12 +1133,24 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
                 editor = self.decisionTable.makeCellPair(row,col,q,cond,text)
 
                 self.decisionTable.setCellWidget(row,col,editor)
+                #self.decisionTable.setItem(row,col,editor)
 
+            lang = 'en'
+            selected = rule.xpath("./s:ResultString/s:TextComponent[@xml:lang='%s']" % (lang),namespaces=_namespaces)
+            if len(selected) > 0:
+                text = selected[0].text
+            else:
+                text = ""
+            widget = QtGui.QTableWidgetItem(text)
+            self.decisionTable.setItem(row,col+1,widget)
+
+        self.decisionTable.setHorizontalHeaderItem(col+1,QtGui.QTableWidgetItem("Text"))
         self.decisionTable.resizeColumnsToContents() 
+        self.decisionTable.horizontalHeader().setStretchLastSection(True)
 
         # Connects for allowing reordering of Branch columns conditionals
-        self.decisionTable.horizontalHeader().setMovable(True)
-        #self.decisionTable.horizontalHeader().sectionMoved.connect(self.moveColumn)
+        self.decisionTable.verticalHeader().setMovable(True)
+        #self.decisionTable.verticalHeader().sectionMoved.connect(self.moveRow)
 
 class WordSubText(SQBLTextComponentObject, sqblUI.wordSubText.Ui_Form):
     def __init__(self,element,model):
