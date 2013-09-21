@@ -75,6 +75,7 @@ class SQBLWidget(QtGui.QWidget):
             self.model.emit(QtCore.SIGNAL('layoutChanged()'))
         self.model.emit(QtCore.SIGNAL('dataChanged()'))
 
+#TODO: This seriously needs a better name moron
 class SQBLWeirdThingWidget(SQBLWidget):
     # langXPath is the prefix for where to search for the langs from
     #   Above added so we didn't need to duplicate the below stuff for BulkQuestionEditors

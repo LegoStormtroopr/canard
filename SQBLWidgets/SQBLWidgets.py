@@ -554,6 +554,7 @@ class DecisionTable(QtGui.QTableWidget):
         editor = QtGui.QWidget(self)
         combo = QtGui.QComboBox(self)
 
+        if value is None: value = ""
         index = 0
         combo.addItem("None")
         for i, x in enumerate(SQBLutil.comparisons()):
@@ -562,21 +563,19 @@ class DecisionTable(QtGui.QTableWidget):
             if name == condition:
                 index = i+1 
         combo.setFixedWidth(60)
-        combo.setStyleSheet('font-size: 11pt;')
 
         editbox = QtGui.QLineEdit(self)
         editbox.setText(value)
-        editbox.setMaximumWidth(100)
+        editbox.setMinimumWidth(30)
 
         #If the index is changed to the "none" comparison, disable to value
         def changedCombo(index):
             editbox.setEnabled(index != 0)
-            editbox.setText("")
+            if index == 0: editbox.setText("") #Blank text if its None
             self.parent.cellPairComboChanged.emit(col,index,questionId)
 
         def changedText():
             self.parent.cellPairTextChanged.emit(col,questionId,editbox.text())
-            print col,questionId,editbox.text()
 
 #        self.connect(self.model, QtCore.SIGNAL('dataChanged()'), self.thingsChanged)
 
@@ -666,8 +665,9 @@ class ConditionalTree(SQBLNamedWidget, sqblUI.conditionalTree.Ui_Form):
             valueof.set('is',comp)
         else:
             x.remove(x.xpath("./s:ValueOf[@question='%s']"%qid,namespaces=_namespaces)[0])
-            if len(x.xpath("./s:ValueOf",namespaces=_namespaces)) == 0:
-                x.getparent().remove(x)
+            # Commenting out below as it has issues :/
+            #if len(x.xpath("./s:ValueOf",namespaces=_namespaces)) == 0:
+            #    x.getparent().remove(x)
         self.update()
 
     def changedPairText(self,col,qid,value):
@@ -852,44 +852,6 @@ class ConditionalTree(SQBLNamedWidget, sqblUI.conditionalTree.Ui_Form):
         self.update(big=True)
         
 
-## All below is out of sync with the vert and needs a big update to be ready.
-## HOWEVER, it seems like a horiontal view of the decision table would be un user-friendly.
-##    def updateDecisionTableHoriz(self):
-##        self.decisionTable.clearContents()
-##        self.decisionTable.setRowCount(1)
-##
-##        questions = set()
-##        for i in self.element.xpath("./s:SequenceGuide//s:ValueOf",namespaces=_namespaces):
-##            questions.add(i.get('question'))
-##        questions = list(questions)
-##        questions.sort()
-##
-##        # Add one, cause we need the first column for Branches, this happens a few times
-##        self.decisionTable.setColumnCount(len(questions)+1)
-##        self.decisionTable.setHorizontalHeaderItem(0,QtGui.QTableWidgetItem("Branch"))
-##        for i,q in enumerate(questions):
-##            self.decisionTable.setHorizontalHeaderItem(i+1,QtGui.QTableWidgetItem(q))
-##
-##        for row, cond in enumerate(self.element.xpath("./s:SequenceGuide/s:Condition",namespaces=_namespaces)):
-##            selected = cond.get('resultBranch')
-##            combo = self.makeBranchesCombo(selected=selected)
-##            widget = QtGui.QWidget(self)
-##            layout = QtGui.QHBoxLayout(self)
-##            layout.addWidget(combo)
-##            layout.setContentsMargins(1, 2, 2, 1)
-##            widget.setLayout(layout)
-##
-##            combo.setContentsMargins(1, 2, 2, 1)
-##
-##            self.decisionTable.setCellWidget(row,0,widget)
-##            for val in cond.xpath("./s:ValueOf",namespaces=_namespaces):
-##                question = val.get('question')
-##                col = questions.index(question) +1 #Because of the first branch column
-##                editor = self.decisionTable.makeCellPair(val.get('is'),val.text)
-##
-##                self.decisionTable.setCellWidget(row,col,editor)
-##        self.decisionTable.resizeColumnsToContents() 
-
     # Accepts a text field, the id of a branch to have selected, and an existing ComboBox to be refreshed - all optional
     def makeBranchesCombo(self,header = None, selected=None,existing=None):
         if existing is not None:
@@ -1070,6 +1032,12 @@ class RichTextToolBar(QtGui.QWidget):
         self.horizontalLayout.addWidget(self.fontComboBox)
 
 class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
+    #Signal fired if the combo box for a comparator in a pair is changed
+    #column,index of comparator, questionID, value of the edit string
+    cellPairComboChanged = QtCore.pyqtSignal(int,int,'QString')
+    #Signal fired if the text box for a value in a pair is changed
+    #column, questionID, value of the edit string
+    cellPairTextChanged = QtCore.pyqtSignal(int,'QString','QString')
     def __init__(self,element,model):
         SQBLNamedWidget.__init__(self,element,model,WordSubText)
 
@@ -1082,22 +1050,40 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
         #self.configureLanguages(self.languages)
 
         #self.wordSubText.textChanged.connect(self.updateTagName)
-        #self.languages.currentIndexChanged[int].connect(self.updateField)
+        self.languagePicker.languageList.currentIndexChanged[int].connect(self.changeDecisionTableLanguage)
+        self.decisionTable.itemChanged.connect(self.updateResultText)
 
     def updateTagName(self,text):
         lang = self.languages.itemData(self.languages.currentIndex()).toPyObject()
         elem = self.element.xpath("./s:ResultString" % (tagname),namespaces=_namespaces)[0]
         self.updateTextComponent(lang,text,elem)
 
-    # This function updates the value of this text box if the language picker changes
-    def updateField(self,index):
+    def updateResultText(self,item):
+        if item is None:
+            #How did you get here ?
+            return
+        if item.column()+1 != self.decisionTable.columnCount():
+            #These changes get picked up elsewhere.
+            return
+        langPicker = self.languagePicker.languageList
         lang = str(langPicker.itemData(index).toPyObject())
-        text = self.element.xpath("./s:ResultString/s:TextComponent[@xml:lang='%s']" % (tagname,lang),namespaces=_namespaces)
+        text = self.element.xpath(".s:Condition[%d]/s:ResultString/s:TextComponent[@xml:lang='%s']" % (item.column(),lang),namespaces=_namespaces)
+        value = unicode(item.text())
+        if len(text) > 0:
+            text[0].text(value)
+        self.update()
+
+    # This function updates the value of this text box if the language picker changes
+    def changeDecisionTableLanguage(self,index):
+        langPicker = self.languagePicker.languageList
+        lang = str(langPicker.itemData(index).toPyObject())
+        text = self.element.xpath("./s:ResultString/s:TextComponent[@xml:lang='%s']" % (lang),namespaces=_namespaces)
         value = ""
         if len(text) > 0:
-            value = text[0].textText(value)
-        self.wordSubText.set
-        self.update()
+            value = text[0].text
+            #Text(value)
+        #self.wordSubText.set
+        #self.update()
 
     def updateDecisionTable(self):
         self.decisionTable.clearContents()
@@ -1148,9 +1134,42 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
         self.decisionTable.resizeColumnsToContents() 
         self.decisionTable.horizontalHeader().setStretchLastSection(True)
 
+        self.cellPairComboChanged.connect(self.changedPairCombo)
+        self.cellPairTextChanged.connect(self.changedPairText)
+
         # Connects for allowing reordering of Branch columns conditionals
         self.decisionTable.verticalHeader().setMovable(True)
         #self.decisionTable.verticalHeader().sectionMoved.connect(self.moveRow)
+
+    def changedPairCombo(self,col,index,qid):
+        x = self.element.xpath("./s:Condition",namespaces=_namespaces)[col]
+        if index > 0:
+            valueof = self.getValueElement(col,qid)
+            comp = SQBLutil.comparisons()[index-1][1]
+            valueof.set('is',comp)
+        else:
+            x.remove(x.xpath("./s:ValueOf[@question='%s']"%qid,namespaces=_namespaces)[0])
+            # Commenting out below as it has issues :/
+            # TODO: Deleting the condition SHOULD be fine, but it means columns and conditions get out of sync, causing buggy behaviour. Fix this in the other place too.
+            #if len(x.xpath("./s:ValueOf",namespaces=_namespaces)) == 0:
+            #    x.getparent().remove(x)
+        self.update()
+
+    def changedPairText(self,col,qid,value):
+        valueof = self.getValueElement(col,qid)
+        valueof.text = str(value)
+        self.update()
+
+    def getValueElement(self,col,qid):
+        x = self.element.xpath("./s:Condition",namespaces=_namespaces)[col]
+        valueof = x.xpath("./s:ValueOf[@question='%s']"%qid,namespaces=_namespaces)
+        if len(valueof) > 0:
+            valueof = valueof[0]
+        else:
+            valueof = etree.Element(_ns("s","ValueOf"))
+            valueof.set('question',str(qid))
+            x.insert(0,valueof)
+        return valueof
 
 class WordSubText(SQBLTextComponentObject, sqblUI.wordSubText.Ui_Form):
     def __init__(self,element,model):
