@@ -755,6 +755,21 @@ QDockWidget &gt; * {
     <string>Insert a &quot;Word subtitution&quot; into the current rich text field</string>
    </property>
   </action>
+  <action name="actionCreateNewWordsub">
+   <property name="icon">
+    <iconset resource="../icons/canard.qrc">
+     <normaloff>:/icons/actions/insert-text-2.png</normaloff>:/icons/actions/insert-text-2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create new Wordsub</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a new &quot;Word subtitution&quot;</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+W</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

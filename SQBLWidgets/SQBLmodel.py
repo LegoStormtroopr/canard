@@ -91,15 +91,15 @@ class QuestionModule(QtCore.QAbstractItemModel):
         else:
             ws = ws[0]
 
-        wordSubs = SQBLModuleUnnamedItem(
+        self.wordSubs = SQBLModuleUnnamedItem(
                 ws,
                 module,
                 label=u"Word Substitutions",
                 icon=QtGui.QIcon("icons/WordSubs.png")
                 )
-        module.appendChild(wordSubs)
+        module.appendChild(self.wordSubs)
         for sub in ws.iterchildren(tag=_ns('s','WordSub')):
-            wordSubs.appendChild(SQBLModuleNamedItem(sub,wordSubs))
+            self.wordSubs.appendChild(SQBLModuleNamedItem(sub,self.wordSubs))
 
         modLogic = [i for i in data.iterchildren(tag=_ns('s','ModuleLogic'))][0]
         logic = SQBLModuleUnnamedItem(
@@ -150,6 +150,14 @@ class QuestionModule(QtCore.QAbstractItemModel):
         #else:
         
         return newparent
+
+    def addWordSub(self):
+        w = self.wordSubs
+        name = "NewWordSub %d"%(len(w.childItems)+1)
+        element = etree.fromstring(newWordSub(name))
+        w.element.append(element)
+        w.appendChild(SQBLModuleNamedItem(element,w)) 
+        self.emit(QtCore.SIGNAL('dataChanged()'))
 
     # Change the object with the oldname to the newname
     def changeName(self,oldname,newname):
@@ -580,6 +588,9 @@ def newBranch(name):
     """.format( s=_namespaces['s'],
                 branch_name = name,
                 )
+
+def newWordSub(name):
+    return """<WordSub xmlns="{s}" name="{name}"/>""".format( s=_namespaces['s'],name = name)
 
 def newQuestionGroup(name,question="QuestionID"):
     # We allow this to be non-conformant by not including a condition, and assume the user will 'do the right thing'

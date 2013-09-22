@@ -193,11 +193,9 @@ class SubQuestion(SQBLWeirdThingWidget, sqblUI.subQuestion.Ui_Form):
             rows.sort(); rows.reverse()
         else:
             rows = [index]
-        print index,rows
         for row in rows:
             self.subQuestionList.removeRow(row)
             subQ = self.subQuestions.xpath("s:SubQuestion",namespaces=_namespaces)[row] 
-            print etree.tostring(subQ)
             self.subQuestions.remove(subQ)
 
         if self.subQuestionList.rowCount() == 0:
@@ -280,7 +278,6 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
         self.questionTabs.setCurrentIndex(self.getPrefTab())
 
     def reorderResponse(self,tabTo,tabFrom):
-        print "hello",tabFrom,tabTo
         movedResponse = self.responses.xpath("./*",namespaces=_namespaces)[tabFrom]
         self.responses.insert(tabTo,movedResponse)
         self.update()
@@ -367,7 +364,6 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
         dlg = repoDialog(self,objectType="ObjectClass")
         if dlg.exec_():
             values = dlg.getValues()
-            print values
 
     def setCanRefuse(self,canRefuse):
         if canRefuse:
@@ -649,7 +645,6 @@ class ConditionalTree(SQBLNamedWidget, sqblUI.conditionalTree.Ui_Form):
         deleteAction = menu.addAction("Delete Condition")
         action = menu.exec_(header.mapToGlobal(pos))
         if action == deleteAction:
-            print "delete"
             col = header.visualIndex(header.logicalIndexAt(pos))
             self.decisionTable.removeColumn(col)
             condition = self.element.xpath("./s:SequenceGuide/s:Condition[position()=%s]"%(col+1),namespaces=_namespaces)[0] #Add one because XML positions are indexed from 1. DAMN IT.
@@ -767,8 +762,6 @@ class ConditionalTree(SQBLNamedWidget, sqblUI.conditionalTree.Ui_Form):
                     )
         self.defaultBranch = combo 
         self.defaultBranch.currentIndexChanged.connect(self.changeDefaultBranch)
-        print [self.defaultBranch.itemText(i) for i in range(self.defaultBranch.count())]
-        print self.defaultBranch.isEnabled()
 
     def changeDefaultBranch(self,index):
         sg =  self.element.xpath("./s:SequenceGuide",namespaces=_namespaces)[0] #there should be only one
@@ -922,7 +915,6 @@ class SQBLTextComponentObject(SQBLWidget):
                     line=e.error_log.last_error.line
                     col=e.error_log.last_error.column
                     ttText = "Invalid XML: Line %s, Col %s\n %s"%(line,col,msg)
-                    #print ttText
                     QtGui.QToolTip.showText(pos,ttText)
                     elem.text = unicode(UiField.toPlainText())
                     for e in elem:
@@ -1046,10 +1038,6 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
         self.decisionTable = dt
 
         self.updateDecisionTable()
-        #self.connectAddRemoveLanguages(self.addLanguage,self.removeLanguage,self.languages)
-        #self.configureLanguages(self.languages)
-
-        #self.wordSubText.textChanged.connect(self.updateTagName)
         self.languagePicker.languageList.currentIndexChanged[int].connect(self.changeDecisionTableLanguage)
         self.decisionTable.itemChanged.connect(self.updateResultText)
 
@@ -1066,24 +1054,34 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
             #These changes get picked up elsewhere.
             return
         langPicker = self.languagePicker.languageList
-        lang = str(langPicker.itemData(index).toPyObject())
-        text = self.element.xpath(".s:Condition[%d]/s:ResultString/s:TextComponent[@xml:lang='%s']" % (item.column(),lang),namespaces=_namespaces)
+        lang = str(langPicker.itemData(langPicker.currentIndex()).toPyObject())
+        text = self.element.xpath("./s:Condition[%d]/s:ResultString/s:TextComponent[@xml:lang='%s']" % (item.row()+1,lang),namespaces=_namespaces) # Add one because XML :(
         value = unicode(item.text())
         if len(text) > 0:
-            text[0].text(value)
+            text[0].text = value
+        else:
+            #There is no text yet...
+            elem = self.element.xpath("./s:Condition[%d]/s:ResultString" % (item.row()+1),namespaces=_namespaces)[0] # Add one because XML :(
+            element = etree.Element("{%s}TextComponent"%(_namespaces['s']))
+            element.set("{%s}lang"%(_namespaces['xml']),lang)
+            element.text = value
+            elem.append(element)
         self.update()
 
     # This function updates the value of this text box if the language picker changes
     def changeDecisionTableLanguage(self,index):
+        print "hello"
         langPicker = self.languagePicker.languageList
         lang = str(langPicker.itemData(index).toPyObject())
-        text = self.element.xpath("./s:ResultString/s:TextComponent[@xml:lang='%s']" % (lang),namespaces=_namespaces)
-        value = ""
-        if len(text) > 0:
-            value = text[0].text
-            #Text(value)
-        #self.wordSubText.set
-        #self.update()
+        for row, rule in enumerate(self.element.xpath("./s:Condition",namespaces=_namespaces)):
+            selected = rule.xpath("./s:ResultString/s:TextComponent[@xml:lang='%s']" % (lang),namespaces=_namespaces)
+            if len(selected) > 0:
+                text = selected[0].text
+            else:
+                text = ""
+            widget = QtGui.QTableWidgetItem(text)
+            col = self.decisionTable.columnCount() - 1
+            self.decisionTable.setItem(row,col,widget)
 
     def updateDecisionTable(self):
         self.decisionTable.clearContents()
@@ -1094,6 +1092,9 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
         questions = list(questions)
         questions.sort()
 
+        langPicker = self.languagePicker.languageList
+        lang = str(langPicker.itemData(langPicker.currentIndex()).toPyObject())
+
         # Add one, cause we need the first column for Branches, this happens a few times
         self.decisionTable.setRowCount(len(questions)+1)
         # Ad
@@ -1103,6 +1104,7 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
         for i,q in enumerate(questions):
             self.decisionTable.setHorizontalHeaderItem(i,QtGui.QTableWidgetItem(q+" "))
 
+        col=-1 # we use this later. If ther are no conditions, this gets incremented to one
         for row, rule in enumerate(self.element.xpath("./s:Condition",namespaces=_namespaces)):
             #widget = self.decisionTable.makeBranchSelectCell(selected)
 
@@ -1121,7 +1123,6 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
                 self.decisionTable.setCellWidget(row,col,editor)
                 #self.decisionTable.setItem(row,col,editor)
 
-            lang = 'en'
             selected = rule.xpath("./s:ResultString/s:TextComponent[@xml:lang='%s']" % (lang),namespaces=_namespaces)
             if len(selected) > 0:
                 text = selected[0].text

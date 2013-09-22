@@ -59,6 +59,9 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
 #        self.treeView.header().setStretchLastSection(False) # Not sure why I added this, so I'll leave it here for a little while. Its a UI thing anyway.
         self.treeView.setAcceptDrops(True)        
         self.treeView.header().setStretchLastSection(True)
+        self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.treeView.customContextMenuRequested.connect(self.doMenu)
+        
         self.safeToRefresh = True
 
         # Subclassing is BULLSHIT
@@ -85,6 +88,9 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         self.autoFlowchartRefresh = True
         self.actionAutoRefreshFlowchart.toggled.connect(self.setAutoFlowchartRefresh)
         self.actionAutoRefreshFlowchart.setChecked(self.autoFlowchartRefresh)
+
+        #Connect more actions
+        self.actionCreateNewWordsub.triggered.connect(self.addWordSub)
 
         # Connect import/export refreshers
         self.actionRefreshImport.triggered.connect(self.refreshImportMenu)
@@ -117,6 +123,20 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
             self.openFile(filename)
         else:
             self.newModule()
+
+    def doMenu(self, point):
+        treeidx=self.treeView.indexAt(point)
+        menu = QtGui.QMenu(self)
+        tag = self.model.data(treeidx,"element").tag
+        tag = tag.replace("{%s}"%SQBLmodel._namespaces['s'],"")
+        print tag
+        if tag == "WordSubstitutions":
+            menu.addAction(self.actionCreateNewWordsub)
+        x = menu.exec_(self.treeView.mapToGlobal(point))
+        print x
+
+    def addWordSub(self):
+        self.model.addWordSub()
 
     def vanityBox(self):
         vanityText = """<html>

@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>actions/insert-text-2.png</file>
     <file>Canard_icon.png</file>
     <file>Branch.png</file>
     <file>ConditionalTree.png</file>
