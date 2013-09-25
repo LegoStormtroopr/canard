@@ -240,6 +240,14 @@ class QuestionModule(QtCore.QAbstractItemModel):
         data = indexes[0].internalPointer().getXML()
         mimedata = QtCore.QMimeData()
         mimedata.setData('text/xml+x-sqbl', data)
+        
+        if indexes[0].internalPointer().element.tag in [
+                _ns("s","Question"),
+                _ns("s","WordSub")
+                _ns("s","ForLoop")
+        ]:
+            wordsub = "<sub ref='%s'/>"% indexes[0].internalPointer().element.get('name')
+            mimedata.setData('text/xml+x-sqbl+wordsub', wordsub)
         return mimedata
 
     def dropMimeData(self, data, action, row, column, parent):

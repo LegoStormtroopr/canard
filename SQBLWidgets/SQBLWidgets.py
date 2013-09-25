@@ -878,6 +878,23 @@ class SQBLTextComponentObject(SQBLWidget):
     def connect(self,UiField, tagname,richtext=False):
         # Here we catch te textChanged SIG from QTextEdit and QLineEdit
         # QLineEdit gives the text as well, but just catch it and throw it away.
+
+        if richtext: 
+            def canInsertFromMimeData(q,s=UiField): 
+                if q.hasFormat("text/xml+x-sqbl+wordsub"):
+                    return True
+                else:
+                    QtGui.QTextEdit.canInsertFromMimeData(q, event) 
+            UiField.canInsertFromMimeData = canInsertFromMimeData
+
+            def insertFromMimeData(q,s=UiField): 
+                if q.hasFormat("text/xml+x-sqbl+wordsub"):
+                    insert = str(q.data('text/xml+x-sqbl+wordsub'))
+                    s.insertPlainText(insert)
+                else:
+                    QtGui.QTextEdit.insertFromMimeData(q, event) 
+            UiField.insertFromMimeData = insertFromMimeData
+        
         def updateTagName(str=None):
             elem = self.element.xpath("./s:%s" % tagname,namespaces=_namespaces)
             if len(elem) > 0:
@@ -922,14 +939,6 @@ class SQBLTextComponentObject(SQBLWidget):
                 except:
                     QtGui.QToolTip.showText(pos,"Invalid XML: Unknown error")
                     raise
-                #rt = unicode(UiField.toHtml())
-                #rt.replace('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">',"")
-                #xml = etree.fromstring(rt)
-                #elem.clear()
-                #for p in xml.xpath("//body/p"):
-                #    p.attrib.pop('style')
-                #    elem.append(p)
-                #elem.text = str(UiField.toHtml())
             self.update()
 
         text = ""
