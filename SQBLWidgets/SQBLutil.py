@@ -148,55 +148,69 @@ class SQBLUnnamedWidget(SQBLWidget):
     def __init__(self,element,model,textType):
         SQBLWidget.__init__(self,element,model)
         self.textType = textType
-        self.texts = []
+        self.textLanguages = []
         self.activeLanguage = "en"
 
-        for text in self.element.xpath("./s:TextComponent",namespaces=_namespaces):
-            self.texts.append(text.get(_ns("xml","lang")))
-        if self.activeLanguage not in self.texts and len(self.texts) > 0:
-            self.activeLanguage = self.texts[0]
+        # If its uses a "components" section use that, otherwise pull straight from the element
+        newStyle = ["QuestionModule"]
+        newStyle = [_ns("s",x) for x in newStyle] # Add namespaces
+        if self.element.tag in newStyle:
+            textCs = self.element.xpath("./s:TextComponents",namespaces=_namespaces)
+            print "Has I got",self.element.tag
+            if len(textCs) == 0:
+                textCs = etree.Element(_ns("s","TextComponents"))
+                self.element.insert(0,textCs)
+            else:
+                textCs = textCs[0]
+        else:
+            textCs = self.element
+        self.texts = textCs
+        for text in self.texts.xpath("./s:TextComponent",namespaces=_namespaces):
+            self.textLanguages.append(text.get(_ns("xml","lang")))
+        if self.activeLanguage not in self.textLanguages and len(self.textLanguages) > 0:
+            self.activeLanguage = self.textLanguages[0]
 
         self.languagePicker = languagePicker.LanguagePickerWidget(
                     language=self.activeLanguage,
-                    languages=sorted(self.texts)
+                    languages=sorted(self.textLanguages)
                 )
         self.textLayout = self.textTab.layout()
         self.textLayout.addWidget(self.languagePicker)
         self.textLayout.setContentsMargins(1, 2, 2, 1)        
         self.textBox = None
 
-        def changeLanguage(lang):
-            try:
-                self.textLayout.removeWidget(self.textBox)
-                oldText = self.textBox
-                if oldText is not None:
-                    oldText.deleteLater()
-            finally:
-                text = self.element.xpath("./s:TextComponent[@xml:lang='%s']"%lang,
-                    namespaces=_namespaces)[0]
-                self.activeLanguage = str(lang)
-                self.textBox = self.textType(text,self.model)
-
-                self.textLayout.insertWidget(1,self.textBox)
-        self.languagePicker.currentLanguageChanged.connect(changeLanguage)
-
+        self.languagePicker.currentLanguageChanged.connect(self.changeLanguage)
         self.languagePicker.languageAdded.connect(self.addLanguage)
         self.languagePicker.languageRemoved.connect(self.removeLanguage)
 
-        if len(self.texts) == 0:
+        if len(self.textLanguages) == 0:
             newLang = unicode(Canard_settings.getPref('defaultObjectLangauge'))
             self.addLanguage(newLang)
         self.languagePicker.setLanguage(self.activeLanguage)
+
+    def changeLanguage(self,lang):
+        try:
+            self.textLayout.removeWidget(self.textBox)
+            oldText = self.textBox
+            if oldText is not None:
+                oldText.deleteLater()
+        finally:
+            text = self.texts.xpath("./s:TextComponent[@xml:lang='%s']"%lang,
+                namespaces=_namespaces)[0]
+            self.activeLanguage = str(lang)
+            self.textBox = self.textType(text,self.model)
+
+            self.textLayout.insertWidget(1,self.textBox)
 
     def addLanguage(self,lang):
         lang = str(lang)
         newText = etree.Element(_ns("s","TextComponent"))
         newText.set("{%s}lang"%_namespaces['xml'],lang)
-        self.element.insert(0,newText) # TextComponents are ALWAYS the first element, so we can just pop them up front
+        self.texts.insert(0,newText) # TextComponents are ALWAYS the first element, so we can just pop them up front
 
     def removeLanguage(self,lang):
         print lang
-        elem = self.element.xpath("./s:TextComponent[@xml:lang='%s']"%lang,
+        elem = self.texts.xpath("./s:TextComponent[@xml:lang='%s']"%lang,
                 namespaces=_namespaces)[0]
         elem.getparent().remove(elem)
 
@@ -204,7 +218,7 @@ class SQBLUnnamedWidget(SQBLWidget):
 # Node objects in the Module Logic, questions, conditionals, loops, etc...
 # Ie. Things which have names and text components
 class SQBLNamedWidget(SQBLUnnamedWidget):
-    # We need the eleemnt itself, a reference to the model, and a class name for us to make the text component UI bits from
+    # We need the element itself, a reference to the model, and a class name for us to make the text component UI bits from
     def __init__(self,element,model,textType,tabWidget=None):
         SQBLUnnamedWidget.__init__(self,element,model,textType)
 
@@ -328,3 +342,49 @@ class NewLanguageTab(QtGui.QWidget,sqblUI.newLanguageTab.Ui_Form):
             self.languageList.removeItem(self.languageList.currentIndex())
         self.parent.languageTabs.setCurrentIndex(index)
 
+# Below sourced from: http://www.yasinuludag.com/blog/?p=49
+# Slight changes have been made for SQBL content
+class XMLHighlighter(QtGui.QSyntaxHighlighter):
+ 
+    #INIT THE STUFF
+    def __init__(self, parent=None):
+        super(XMLHighlighter, self).__init__(parent)
+ 
+        self.highlightingRules = []
+
+        xmlEm = QtGui.QTextCharFormat()
+        xmlEm.setFontItalic(True)
+        xmlEm.setForeground(QtCore.Qt.darkBlue)
+        xmlEmRegex = QtCore.QRegExp("<em\s*>.*<\/em\s*>")
+        xmlEmRegex.setMinimal(True)
+        self.highlightingRules.append((xmlEmRegex, xmlEm))
+
+        xmlWordSub = QtGui.QTextCharFormat()
+        xmlWordSub.setFontWeight(QtGui.QFont.Bold)
+        xmlWordSub.setForeground(QtCore.Qt.darkRed)
+        xmlWordSubRegex = QtCore.QRegExp("<sub\s*.*\/>")
+        xmlWordSubRegex.setMinimal(True)
+        self.highlightingRules.append((xmlWordSubRegex, xmlWordSub))
+
+ 
+    #VIRTUAL FUNCTION WE OVERRIDE THAT DOES ALL THE COLLORING
+    def highlightBlock(self, text):
+ 
+        #for every pattern
+        for pattern, format in self.highlightingRules:
+ 
+            #Create a regular expression from the retrieved pattern
+            expression = QtCore.QRegExp(pattern)
+ 
+            #Check what index that expression occurs at with the ENTIRE text
+            index = expression.indexIn(text)
+ 
+            #While the index is greater than 0
+            while index >= 0:
+ 
+                #Get the length of how long the expression is true, set the format from the start to the length with the text format
+                length = expression.matchedLength()
+                self.setFormat(index, length, format)
+ 
+                #Set index to where the expression ends in the text
+                index = expression.indexIn(text, index + length)

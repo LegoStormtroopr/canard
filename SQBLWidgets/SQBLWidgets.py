@@ -411,9 +411,9 @@ class StopModule(SQBLNamedWidget, sqblUI.stopModule.Ui_Form):
     def __init__(self,element,model):
         SQBLNamedWidget.__init__(self,element,model,LogicNodeText)
 
-class DecisionTableHeader(QtGui.QHeaderView):
+class CTDecisionTableHeader(QtGui.QHeaderView):
     def __init__(self, orientation, parent):
-        super(DecisionTableHeader, self).__init__(orientation, parent)
+        super(CTDecisionTableHeader, self).__init__(orientation, parent)
         self.setAcceptDrops(True)
         self.setDragEnabled(True)
         self.parent = parent
@@ -452,21 +452,106 @@ class DecisionTableHeader(QtGui.QHeaderView):
 
         event.accept()
 
+#WordSub header
+class WSDecisionTableHeader(QtGui.QHeaderView):
+    def __init__(self, orientation, parent):
+        super(WSDecisionTableHeader, self).__init__(orientation, parent)
+        self.setAcceptDrops(True)
+        self.setDragEnabled(True)
+        self.parent = parent
+
+    def dragEnterEvent(self, event):
+        # Only accept sqbl drops here
+        # We may even restrict this further to only drops from the same instance
+        if event.mimeData().hasFormat('text/xml+x-sqbl'):
+            event.accept()
+        else:
+            event.ignore()
+
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasFormat('text/xml+x-sqbl'):
+            element = etree.fromstring(str(event.mimeData().data('text/xml+x-sqbl')))
+            # We can only add questions to the table to make conditions...
+            # Also, if the question is already in the table, we can't add it again.
+            if self.orientation() == QtCore.Qt.Horizontal and element.tag == _ns('s','Question') and element.get('name') not in self.parent.parent.questions:
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        element = etree.fromstring(str(event.mimeData().data('text/xml+x-sqbl')))
+        if self.orientation() == QtCore.Qt.Horizontal:
+            self.parent.addNewQuestion.emit(element.get('name'))
+        event.setDropAction(QtCore.Qt.MoveAction)
+
+        event.accept()
+
 
 class DecisionTable(QtGui.QTableWidget):
     addNewQuestion = QtCore.pyqtSignal('QString')
-    addNewBranchCondition = QtCore.pyqtSignal('QString')
 
     def __init__(self, rows, columns, parent):
         super(DecisionTable, self).__init__(rows, columns, parent)
-        self.setHorizontalHeader(DecisionTableHeader(QtCore.Qt.Horizontal,self))
-        self.setVerticalHeader(DecisionTableHeader(QtCore.Qt.Vertical,self))
+
+        self.parent = parent 
+        #self.verticalHeader().setVisible(True)
+        #self.horizontalHeader().setVisible(True)
+
+    # pos is the ordered number of the condition in the parent element
+    def makeCellPair(self,pos,questionId,condition=None,value="",):
+        editor = QtGui.QWidget(self)
+        combo = QtGui.QComboBox(self)
+
+        if value is None: value = ""
+        index = 0
+        combo.addItem("None")
+        for i, x in enumerate(SQBLutil.comparisons()):
+            cond,name = x
+            combo.addItem(cond)
+            if name == condition:
+                index = i+1 
+        combo.setFixedWidth(60)
+
+        editbox = QtGui.QLineEdit(self)
+        editbox.setText(value)
+        editbox.setMinimumWidth(30)
+
+        #If the index is changed to the "none" comparison, disable to value
+        def changedCombo(index):
+            editbox.setEnabled(index != 0)
+            if index == 0: editbox.setText("") #Blank text if its None
+            self.parent.cellPairComboChanged.emit(pos,index,questionId)
+
+        def changedText():
+            self.parent.cellPairTextChanged.emit(pos,questionId,editbox.text())
+
+#        self.connect(self.model, QtCore.SIGNAL('dataChanged()'), self.thingsChanged)
+
+        combo.setCurrentIndex(index)
+        combo.currentIndexChanged.connect(changedCombo)
+        editbox.editingFinished.connect(changedText)
+        if index == 0:
+            editbox.setEnabled(False)
+        layout = QtGui.QHBoxLayout(self)
+        layout.addWidget(combo)
+        layout.addWidget(editbox)
+        layout.setSpacing(1)
+        layout.setContentsMargins(1, 2, 2, 1)
+        editor.setLayout(layout)
+        editor.setMinimumWidth(90)
+        return editor
+
+class CTDecisionTable(DecisionTable):
+    addNewBranchCondition = QtCore.pyqtSignal('QString')
+    def __init__(self, rows, columns, parent):
+        super(CTDecisionTable, self).__init__(rows, columns, parent)
+        self.setHorizontalHeader(CTDecisionTableHeader(QtCore.Qt.Horizontal,self))
+        self.setVerticalHeader(CTDecisionTableHeader(QtCore.Qt.Vertical,self))
 
         self.addNewQuestion.connect(self.addRow)
         self.addNewBranchCondition.connect(self.addCol)
-        self.parent = parent 
-        self.verticalHeader().setVisible(True)
-        self.horizontalHeader().setVisible(True)
 
     def addCol(self,branchName):
         # Is the branch a direct child of this object?
@@ -497,13 +582,12 @@ class DecisionTable(QtGui.QTableWidget):
             for o in others:
                 sg.append(o)
 
-
         cols = self.columnCount()
 
         self.insertColumn(cols)
         for row,questionID in enumerate(self.parent.questions):
             # Add the offset for the branch at the start
-            editor = self.makeCellPair(row,cols,str(questionID))
+            editor = self.makeCellPair(cols,str(questionID))
 
             self.setCellWidget(row+1,cols,editor)
 
@@ -531,7 +615,7 @@ class DecisionTable(QtGui.QTableWidget):
             self.insertRow(rows)
             self.setVerticalHeaderItem(rows,QtGui.QTableWidgetItem(questionID+" "))
             for col in range(0,self.columnCount()):
-                editor = self.makeCellPair(rows,col,str(questionID))
+                editor = self.makeCellPair(col,str(questionID))
 
                 self.setCellWidget(rows,col,editor)
 
@@ -546,48 +630,45 @@ class DecisionTable(QtGui.QTableWidget):
 
         return widget
 
-    def makeCellPair(self,row,col,questionId,condition=None,value="",):
-        editor = QtGui.QWidget(self)
-        combo = QtGui.QComboBox(self)
 
-        if value is None: value = ""
-        index = 0
-        combo.addItem("None")
-        for i, x in enumerate(SQBLutil.comparisons()):
-            cond,name = x
-            combo.addItem(cond)
-            if name == condition:
-                index = i+1 
-        combo.setFixedWidth(60)
+class WSDecisionTable(DecisionTable):
+    def __init__(self, rows, columns, parent):
+        super(WSDecisionTable, self).__init__(rows, columns, parent)
+        self.setHorizontalHeader(WSDecisionTableHeader(QtCore.Qt.Horizontal,self))
+        self.addNewQuestion.connect(self.addCol)
 
-        editbox = QtGui.QLineEdit(self)
-        editbox.setText(value)
-        editbox.setMinimumWidth(30)
+    def addRow(self):
+        newCond = etree.fromstring(
+            "<Condition xmlns='{s}'><ResultString/></Condition>".format(
+                s=_namespaces['s']
+            )
+        )
+        # Add the new condition to the XML
+        sg = self.parent.element.append(newCond)
 
-        #If the index is changed to the "none" comparison, disable to value
-        def changedCombo(index):
-            editbox.setEnabled(index != 0)
-            if index == 0: editbox.setText("") #Blank text if its None
-            self.parent.cellPairComboChanged.emit(col,index,questionId)
+        # IF there is only one column and is the empty default one, delete it.
+        #if self.rowCount() == 1 and self.horizontalHeaderItem(0) is not None:
+        #    self.removeRow(0)
 
-        def changedText():
-            self.parent.cellPairTextChanged.emit(col,questionId,editbox.text())
+        row = self.rowCount()
 
-#        self.connect(self.model, QtCore.SIGNAL('dataChanged()'), self.thingsChanged)
+        self.insertRow(row)
+        for cols,questionID in enumerate(self.parent.questions):
+            # Add the offset for the branch at the start
+            editor = self.makeCellPair(cols,str(questionID))
 
-        combo.setCurrentIndex(index)
-        combo.currentIndexChanged.connect(changedCombo)
-        editbox.editingFinished.connect(changedText)
-        if index == 0:
-            editbox.setEnabled(False)
-        layout = QtGui.QHBoxLayout(self)
-        layout.addWidget(combo)
-        layout.addWidget(editbox)
-        layout.setSpacing(1)
-        layout.setContentsMargins(1, 2, 2, 1)
-        editor.setLayout(layout)
-        editor.setMinimumWidth(90)
-        return editor
+            self.setCellWidget(row,cols,editor)
+
+    def addCol(self,questionID):
+        # Is the question already present
+        if questionID not in self.parent.questions:
+            self.parent.questions.append(questionID)
+            col = self.columnCount() - 1 # offest to place before the text
+            self.insertColumn(col)
+            self.setHorizontalHeaderItem(col,QtGui.QTableWidgetItem(questionID+" "))
+            for row in range(0,self.rowCount()):
+                editor = self.makeCellPair(col,str(questionID))
+                self.setCellWidget(row,col,editor)
 
 class ConditionalTree(SQBLNamedWidget, sqblUI.conditionalTree.Ui_Form):
            #column,index of comparator, questionID, value of the edit string
@@ -603,7 +684,7 @@ class ConditionalTree(SQBLNamedWidget, sqblUI.conditionalTree.Ui_Form):
         self.questions = list(set(questions))
 
         # Lets set up the decision table
-        dt = DecisionTable(1,1,self)
+        dt = CTDecisionTable(1,1,self)
         self.DTLayout.addWidget(dt)
         self.decisionTable = dt
         # So we can drop questions to add them
@@ -819,7 +900,7 @@ class ConditionalTree(SQBLNamedWidget, sqblUI.conditionalTree.Ui_Form):
                     # If there is no condition for this pair
                     text = ""
                     cond = None
-                editor = self.decisionTable.makeCellPair(row,col,q,cond,text)
+                editor = self.decisionTable.makeCellPair(col,q,cond,text)
 
                 self.decisionTable.setCellWidget(row,col,editor)
 
@@ -894,6 +975,7 @@ class SQBLTextComponentObject(SQBLWidget):
                 else:
                     QtGui.QTextEdit.insertFromMimeData(q, event) 
             UiField.insertFromMimeData = insertFromMimeData
+            SQBLutil.XMLHighlighter(UiField.document())
         
         def updateTagName(str=None):
             elem = self.element.xpath("./s:%s" % tagname,namespaces=_namespaces)
@@ -1042,13 +1124,27 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
     def __init__(self,element,model):
         SQBLNamedWidget.__init__(self,element,model,WordSubText)
 
-        dt = DecisionTable(1,1,self)
+        dt = WSDecisionTable(0,0,self)
         self.DTLayout.addWidget(dt)
         self.decisionTable = dt
 
         self.updateDecisionTable()
         self.languagePicker.languageList.currentIndexChanged[int].connect(self.changeDecisionTableLanguage)
         self.decisionTable.itemChanged.connect(self.updateResultText)
+        questions = element.xpath("./s:Condition/s:ValueOf/@question",namespaces=_namespaces)
+        self.questions = list(set(questions))
+        self.decisionTable.addNewQuestion.connect(self.enableConditionButtons)
+        self.addCondition.clicked.connect(self.decisionTable.addRow)
+        if len(self.questions) == 0:
+            self.disableConditionButtons()
+        else:
+            self.updateConditionButtons()
+
+    def enableConditionButtons(self): self.updateConditionButtons(True)
+    def disableConditionButtons(self): self.updateConditionButtons(False)
+    def updateConditionButtons(self,enabled=True):
+            self.addCondition.setEnabled(enabled)
+            self.removeCondition.setEnabled(enabled)
 
     def updateTagName(self,text):
         lang = self.languages.itemData(self.languages.currentIndex()).toPyObject()
@@ -1079,7 +1175,6 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
 
     # This function updates the value of this text box if the language picker changes
     def changeDecisionTableLanguage(self,index):
-        print "hello"
         langPicker = self.languagePicker.languageList
         lang = str(langPicker.itemData(index).toPyObject())
         for row, rule in enumerate(self.element.xpath("./s:Condition",namespaces=_namespaces)):
@@ -1105,9 +1200,8 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
         lang = str(langPicker.itemData(langPicker.currentIndex()).toPyObject())
 
         # Add one, cause we need the first column for Branches, this happens a few times
-        self.decisionTable.setRowCount(len(questions)+1)
-        # Ad
-        self.decisionTable.setColumnCount(max(len(self.element.xpath("./s:Condition",namespaces=_namespaces)),1))
+        self.decisionTable.setColumnCount(len(questions)+1) # Add one for text column
+        self.decisionTable.setRowCount(len(self.element.xpath("./s:Condition",namespaces=_namespaces)))
         if len(self.element.xpath("./s:Condition",namespaces=_namespaces)) == 0:
             self.decisionTable.setVerticalHeaderItem(0,QtGui.QTableWidgetItem("0"))
         for i,q in enumerate(questions):
@@ -1115,8 +1209,6 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
 
         col=-1 # we use this later. If ther are no conditions, this gets incremented to one
         for row, rule in enumerate(self.element.xpath("./s:Condition",namespaces=_namespaces)):
-            #widget = self.decisionTable.makeBranchSelectCell(selected)
-
             for col,q in enumerate(questions):
                 val = rule.xpath("./s:ValueOf[@question='%s']"%q,namespaces=_namespaces)
                 if len(val)>0:
@@ -1127,7 +1219,7 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
                     # If there is no condition for this pair
                     text = ""
                     cond = None
-                editor = self.decisionTable.makeCellPair(row,col,q,cond,text)
+                editor = self.decisionTable.makeCellPair(row,q,cond,text)
 
                 self.decisionTable.setCellWidget(row,col,editor)
                 #self.decisionTable.setItem(row,col,editor)

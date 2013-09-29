@@ -53,7 +53,7 @@ class QuestionModule(QtCore.QAbstractItemModel):
         return len(elems) <= 1 #If there are zero element with this name it is also unique
 
     def getModuleName(self,lang='en'):
-        names = self.sqbl.xpath("/s:QuestionModule/s:TextComponent[@xml:lang='%s']/s:LongName"%lang,namespaces=_namespaces)
+        names = self.sqbl.xpath("/s:QuestionModule/s:TextComponents/s:TextComponent[@xml:lang='%s']/s:LongName"%lang,namespaces=_namespaces)
         
         if len(names) > 0:
             return str(names[0].text)
@@ -71,7 +71,7 @@ class QuestionModule(QtCore.QAbstractItemModel):
             pop = etree.Element("{%s}IncomingPopulation"%(_namespaces['s']))
             # Need to re-think this part, it was rushed.
             # We won't insert it yet
-            # data.insert(0,pop)
+            #data.insert(0,pop)
         else:
             pop = pop[0]
         populations = SQBLModuleUnnamedItem(
@@ -85,9 +85,7 @@ class QuestionModule(QtCore.QAbstractItemModel):
         ws = data.xpath('./s:WordSubstitutions',namespaces=_namespaces)
         if len(ws) == 0:
             ws = etree.Element("{%s}WordSubstitutions"%(_namespaces['s']))
-            # Need to re-think this part, it was rushed.
-            # We won't insert it yet
-            # data.insert(0,pop)
+            data.insert(0,ws) # xs:any means we can insert anywhere we want :)
         else:
             ws = ws[0]
 
@@ -153,11 +151,11 @@ class QuestionModule(QtCore.QAbstractItemModel):
 
     def addWordSub(self):
         w = self.wordSubs
-        name = "NewWordSub %d"%(len(w.childItems)+1)
+        name = "NewWordSub_%d"%(len(w.childItems)+1)
         element = etree.fromstring(newWordSub(name))
         w.element.append(element)
         w.appendChild(SQBLModuleNamedItem(element,w)) 
-        self.emit(QtCore.SIGNAL('dataChanged()'))
+        self.emit(QtCore.SIGNAL('layoutChanged()'))
 
     # Change the object with the oldname to the newname
     def changeName(self,oldname,newname):
@@ -243,7 +241,7 @@ class QuestionModule(QtCore.QAbstractItemModel):
         
         if indexes[0].internalPointer().element.tag in [
                 _ns("s","Question"),
-                _ns("s","WordSub")
+                _ns("s","WordSub"),
                 _ns("s","ForLoop")
         ]:
             wordsub = "<sub ref='%s'/>"% indexes[0].internalPointer().element.get('name')
@@ -372,10 +370,6 @@ class QuestionModule(QtCore.QAbstractItemModel):
             return texts
         else:
             print "fail"
-
-
-
-
 
 class TreeItem(object):  
     def __init__(self, data, parent=None,drop=False,icon=None,iconSize=0):  
