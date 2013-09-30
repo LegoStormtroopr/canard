@@ -11,7 +11,7 @@ AppSettings = QtCore.QSettings("sqbl.org", "Canard-App")
 
 from SQBLWidgets.SQBLmodel import _ns
 
-VERSION = "0.1.0B"
+VERSION = "0.2.0B"
 CRITICAL_SIZE = 50 # Number of nodes before refreshes get slow.
 
 _APPWINDOWTITLE = "Canard Question Module Editor"

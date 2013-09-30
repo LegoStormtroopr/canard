@@ -646,18 +646,12 @@ class WSDecisionTable(DecisionTable):
         # Add the new condition to the XML
         sg = self.parent.element.append(newCond)
 
-        # IF there is only one column and is the empty default one, delete it.
-        #if self.rowCount() == 1 and self.horizontalHeaderItem(0) is not None:
-        #    self.removeRow(0)
-
         row = self.rowCount()
 
         self.insertRow(row)
-        for cols,questionID in enumerate(self.parent.questions):
-            # Add the offset for the branch at the start
-            editor = self.makeCellPair(cols,str(questionID))
-
-            self.setCellWidget(row,cols,editor)
+        for col,questionID in enumerate(self.parent.questions):
+            editor = self.makeCellPair(row,str(questionID))
+            self.setCellWidget(row,col,editor)
 
     def addCol(self,questionID):
         # Is the question already present
@@ -667,7 +661,7 @@ class WSDecisionTable(DecisionTable):
             self.insertColumn(col)
             self.setHorizontalHeaderItem(col,QtGui.QTableWidgetItem(questionID+" "))
             for row in range(0,self.rowCount()):
-                editor = self.makeCellPair(col,str(questionID))
+                editor = self.makeCellPair(row,str(questionID))
                 self.setCellWidget(row,col,editor)
 
 class ConditionalTree(SQBLNamedWidget, sqblUI.conditionalTree.Ui_Form):
@@ -965,7 +959,7 @@ class SQBLTextComponentObject(SQBLWidget):
                 if q.hasFormat("text/xml+x-sqbl+wordsub"):
                     return True
                 else:
-                    QtGui.QTextEdit.canInsertFromMimeData(q, event) 
+                    QtGui.QTextEdit.canInsertFromMimeData(s,q) 
             UiField.canInsertFromMimeData = canInsertFromMimeData
 
             def insertFromMimeData(q,s=UiField): 
@@ -973,7 +967,7 @@ class SQBLTextComponentObject(SQBLWidget):
                     insert = str(q.data('text/xml+x-sqbl+wordsub'))
                     s.insertPlainText(insert)
                 else:
-                    QtGui.QTextEdit.insertFromMimeData(q, event) 
+                    QtGui.QTextEdit.insertFromMimeData(s,q) 
             UiField.insertFromMimeData = insertFromMimeData
             SQBLutil.XMLHighlighter(UiField.document())
         
@@ -1074,7 +1068,7 @@ class ConditionalTreeText(SQBLTextComponentObject, sqblUI.conditionalTreeText.Ui
 class StatementText(SQBLTextComponentObject, sqblUI.statementText.Ui_Form):
     def __init__(self,element,model):
         SQBLTextComponentObject.__init__(self,element,model)
-        self.connect(self.statementText,"StatementText")
+        self.connect(self.statementText,"StatementText",richtext=True)
 
 # Reusable by widgets for all 'NogicNodes', eg. Conditionals, Loops, etc...
 class LogicNodeText(SQBLTextComponentObject, sqblUI.logicNodeText.Ui_Form):
@@ -1143,8 +1137,8 @@ class WordSub(SQBLNamedWidget, sqblUI.wordSub.Ui_Form):
     def enableConditionButtons(self): self.updateConditionButtons(True)
     def disableConditionButtons(self): self.updateConditionButtons(False)
     def updateConditionButtons(self,enabled=True):
-            self.addCondition.setEnabled(enabled)
-            self.removeCondition.setEnabled(enabled)
+        self.addCondition.setEnabled(enabled)
+        self.removeCondition.setEnabled(enabled)
 
     def updateTagName(self,text):
         lang = self.languages.itemData(self.languages.currentIndex()).toPyObject()

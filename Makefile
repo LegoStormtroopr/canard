@@ -46,13 +46,15 @@ widgets:
 	pyrcc4 icons/canard.qrc -o SQBLWidgets/sqblUI/canard_rc.py
 
 prepExe:
-	cp -r icons dist/dist/canard_main/
-	rm    dist/dist/canard_main/icons/Canard_icon.ico
-	cp -r images dist/dist/canard_main/
-	mkdir dist/dist/canard_main/roxy
-	cp -r ../roxy-sqbl-instrument-creator/* dist/dist/canard_main/roxy/
-	mkdir dist/dist/canard_main/sqbl
-	cp -r ../sqbl-schema/Schemas/* dist/dist/canard_main/sqbl/
-	mkdir dist/dist/canard_main/examples
-	cp -r ../sqbl-schema/Tests/* dist/dist/canard_main/examples
+	cp -r icons dist/Canard/
+	rm    dist/Canard/icons/Canard_icon.ico
+	cp -r images dist/Canard/
+	mkdir dist/Canard/roxy
+	cp -r ../roxy-sqbl-instrument-creator/* dist/Canard/roxy/
+	mkdir dist/Canard/sqbl
+	cp -r ../sqbl-schema/Schemas/* dist/Canard/sqbl/
+	mkdir dist/Canard/examples
+	cp -r ../sqbl-schema/Tests/* dist/Canard/examples
+	mkdir dist/Canard/plugins
+	cp -r ./plugins/* dist/Canard/plugins
 
