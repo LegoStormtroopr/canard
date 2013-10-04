@@ -4,7 +4,7 @@ from PyQt4 import QtGui, QtCore
 import isoLangCodes
 from lxml import etree
 
-def Dialog(title = "Enter Language", default = None):
+def languagePickerDialog(title = "Enter Language", default = None):
     common = []
     for code,data in isoLangCodes.popularcodes.items():
         common.append(code + " - " + data['name'] + " / " + data['native'])
