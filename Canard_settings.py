@@ -45,8 +45,8 @@ def getPref(key,default=None):
 def setPref(key,value):
     return AppSettings.setValue(key,value)
 
-if getPref('displayLangauge') is None:
-    setPref('displayLangauge','en')
+if getPref('displayLanguage') is None:
+    setPref('displayLanguage','en')
 
 if getPref('defaultObjectLangauges') is None:
     setPref('defaultObjectLangauges',['en','de'])

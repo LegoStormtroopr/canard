@@ -109,26 +109,21 @@ class SQBLWeirdThingWidget(SQBLWidget):
                 field.text = unicode(newText)
             self.update()
 
-    def configureLanguages(self,comboWidget,initialLanguage=None,interfaceLanguage="en"):
+    def configureLanguages(self,comboWidget,initialLanguage=None):
         cw = comboWidget #Just cause its easier to refer to
-        langs = [] 
-        for lang in self.element.xpath(self.langXPathPrefix+"s:TextComponent/@xml:lang",namespaces=_namespaces):
-            if lang is not None and lang not in langs:
-                langName = isoLangCodes.iso639CodeToString(lang)                
-                cw.addItem(langName,lang)
-                langs.append(lang)
-        if len(langs) == 0:
-            #There are no languages, so we'll add the curreent interface language to make sure something is there.
-                langName = isoLangCodes.iso639CodeToString(interfaceLanguage)
-                cw.addItem(langName,interfaceLanguage)
+        langs = sorted(set(
+            self.element.xpath(
+                self.langXPathPrefix+"s:TextComponent/@xml:lang",namespaces=_namespaces
+            ) +
+            [str(s) for s in Canard_settings.getPref('defaultObjectLangauges')]
+        ))
+        # DAMN QT OBJECTS 
+        for lang in langs:
+            langName = isoLangCodes.iso639CodeToString(lang)                
+            cw.addItem(langName,str(lang))
 
-
-        self.languages.setCurrentIndex(-1)
-        if initialLanguage is None: 
-            self.languages.setCurrentIndex(0)
-        else:
-            langIndex = self.languages.findData(initialLanguage)
-            self.languages.setCurrentIndex(max(0,langIndex))
+        langIndex = self.languages.findData(str(Canard_settings.getPref('displayLanguage')))
+        self.languages.setCurrentIndex(max(0,langIndex))
 
     def connectAddRemoveLanguages(self,add,remove,languageCombo):
         def addLanguage():
@@ -149,7 +144,7 @@ class SQBLUnnamedWidget(SQBLWidget):
         SQBLWidget.__init__(self,element,model)
         self.textType = textType
         self.textLanguages = []
-        self.activeLanguage = str(Canard_settings.getPref('displayLangauge'))
+        self.activeLanguage = str(Canard_settings.getPref('displayLanguage'))
 
         # If its uses a "components" section use that, otherwise pull straight from the element
         newStyle = ["QuestionModule"]
@@ -167,6 +162,10 @@ class SQBLUnnamedWidget(SQBLWidget):
         self.texts = textCs
         for text in self.texts.xpath("./s:TextComponent",namespaces=_namespaces):
             self.textLanguages.append(text.get(_ns("xml","lang")))
+        for lang in Canard_settings.getPref('defaultObjectLangauges'):
+            if lang not in self.textLanguages:
+                self.textLanguages.append(lang)
+                self.addLanguage(lang)
         if self.activeLanguage not in self.textLanguages and len(self.textLanguages) > 0:
             self.activeLanguage = self.textLanguages[0]
 
@@ -183,10 +182,6 @@ class SQBLUnnamedWidget(SQBLWidget):
         self.languagePicker.languageAdded.connect(self.addLanguage)
         self.languagePicker.languageRemoved.connect(self.removeLanguage)
 
-        if len(self.textLanguages) == 0:
-            newLangs = unicode(Canard_settings.getPref('defaultObjectLangauges'))
-            for lang in newLangs:
-                self.addLanguage(lang.toPyObject())
         self.languagePicker.setLanguage(self.activeLanguage)
 
     def changeLanguage(self,lang):
@@ -210,7 +205,6 @@ class SQBLUnnamedWidget(SQBLWidget):
         self.texts.insert(0,newText) # TextComponents are ALWAYS the first element, so we can just pop them up front
 
     def removeLanguage(self,lang):
-        print lang
         elem = self.texts.xpath("./s:TextComponent[@xml:lang='%s']"%lang,
                 namespaces=_namespaces)[0]
         elem.getparent().remove(elem)

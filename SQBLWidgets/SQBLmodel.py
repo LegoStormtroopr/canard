@@ -60,6 +60,14 @@ class QuestionModule(QtCore.QAbstractItemModel):
         
         return "Untitled Module"
 
+    def addGlobalLanguage(self,lang):
+        query="//*[s:TextComponent[not(../s:TextComponent[@xml:lang='%s'])]]"%lang
+        elements = self.sqbl.xpath(query,namespaces=_namespaces)
+        for element in elements:
+            newText = etree.Element(_ns("s","TextComponent"))
+            newText.set("{%s}lang"%_namespaces['xml'],lang)
+            element.insert(0,newText) # Safe to just pop right at the front
+
     def setupModelData(self,data,parent):
         module = SQBLModuleNamedItem(data,parent,
                 icon=QtGui.QIcon("icons/Module.png")

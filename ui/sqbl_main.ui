@@ -562,6 +562,7 @@ QDockWidget &gt; * {
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="actionFileABug"/>
     <addaction name="actionBlame"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
@@ -569,7 +570,6 @@ QDockWidget &gt; * {
      <string>&amp;Settings</string>
     </property>
     <addaction name="actionAddLanguageGlobally"/>
-    <addaction name="actionPlugins"/>
     <addaction name="actionShowPreferences"/>
    </widget>
    <addaction name="menuFile"/>
@@ -799,6 +799,9 @@ QDockWidget &gt; * {
    <property name="toolTip">
     <string>Add a new language set to every text component in a survey</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+G</string>
+   </property>
   </action>
   <action name="actionShowPreferences">
    <property name="icon">
@@ -810,6 +813,15 @@ QDockWidget &gt; * {
    </property>
    <property name="toolTip">
     <string>Edit Canard user preferences</string>
+   </property>
+  </action>
+  <action name="actionFileABug">
+   <property name="icon">
+    <iconset resource="../icons/canard.qrc">
+     <normaloff>:/file/actions/tools-report-bug.png</normaloff>:/file/actions/tools-report-bug.png</iconset>
+   </property>
+   <property name="text">
+    <string>File a bug...</string>
    </property>
   </action>
  </widget>

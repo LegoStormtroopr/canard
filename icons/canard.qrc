@@ -11,6 +11,7 @@
     <file>Statement.png</file>
   </qresource>
   <qresource prefix="file">
+    <file>actions/tools-report-bug.png</file>
     <file>actions/applications-development-translation.png</file>
     <file>actions/document-open-recent-3.png</file>
     <file>actions/insert-text-2.png</file>

@@ -24,7 +24,7 @@
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="iconSize">
       <size>
@@ -45,8 +45,11 @@
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QCheckBox" name="checkForUpdates">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
-            <string>Check for updates on startup.</string>
+            <string>Check for updates on startup. (Coming soon)</string>
            </property>
           </widget>
          </item>
@@ -65,6 +68,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Check for updates now...</string>
            </property>
@@ -105,7 +111,7 @@
 If the object doesnt have this language the first available will be used instead</string>
            </property>
            <property name="text">
-            <string>Default display language</string>
+            <string>Default display language:</string>
            </property>
           </widget>
          </item>
@@ -118,6 +124,29 @@ If the object doesnt have this language the first available will be used instead
            <property name="editable">
             <bool>false</bool>
            </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Interface Language:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <item>
+            <property name="text">
+             <string>Coming soon...</string>
+            </property>
+           </item>
           </widget>
          </item>
         </layout>
@@ -192,23 +221,22 @@ If the object doesnt have this language the first available will be used instead
           </widget>
          </item>
          <item row="1" column="0" rowspan="5">
-          <widget class="QListWidget" name="defaultNewLangs"/>
+          <widget class="QListWidget" name="defaultNewLangs">
+           <property name="selectionMode">
+            <enum>QAbstractItemView::ExtendedSelection</enum>
+           </property>
+          </widget>
          </item>
          <item row="1" column="2" rowspan="5">
-          <widget class="QListWidget" name="possibleDefaultNewLangs"/>
+          <widget class="QListWidget" name="possibleDefaultNewLangs">
+           <property name="selectionMode">
+            <enum>QAbstractItemView::ExtendedSelection</enum>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
       </layout>
-     </widget>
-     <widget class="QWidget" name="tab_2">
-      <attribute name="icon">
-       <iconset resource="../icons/canard.qrc">
-        <normaloff>:/file/actions/network-connect-2.png</normaloff>:/file/actions/network-connect-2.png</iconset>
-      </attribute>
-      <attribute name="title">
-       <string>Plugins</string>
-      </attribute>
      </widget>
     </widget>
    </item>

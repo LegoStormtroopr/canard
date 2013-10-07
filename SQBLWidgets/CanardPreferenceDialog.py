@@ -15,22 +15,47 @@ class Dialog(QtGui.QDialog, sqblUI.preferencesDialog.Ui_CanardPreferencesDialog)
     def setupDisplayLanguageCombo(self):
         for code,title in isoLangCodes.languageCodeListPairs():
             self.defaultDisplayLanguage.addItem(title,code)
-        self.defaultDisplayLanguage.insertSeparator(10)
-        langIndex = self.defaultDisplayLanguage.findData(settings.getPref('displayLangauge'))
+        self.defaultDisplayLanguage.insertSeparator(11) # insert after top 10
+        langIndex = self.defaultDisplayLanguage.findData(settings.getPref('displayLanguage'))
         self.defaultDisplayLanguage.setCurrentIndex(max(0,langIndex))
 
     def setupDefaultLanguageList(self):
-        for code,title in isoLangCodes.languageCodeListPairs():
-            if code not in settings.getPref('defaultObjectLangauges'):
-                self.possibleDefaultNewLangs.addItem(title)
-        
+        self.possibleDefaultNewLangs.setSortingEnabled(True)
+        self.defaultNewLangs.setSortingEnabled(True)
+        for code,title in isoLangCodes.languageCodeListPairs(includeTopTen=False):
+            item = QtGui.QListWidgetItem(title)
+            item.setData(QtCore.Qt.UserRole,code)
+            if code in settings.getPref('defaultObjectLangauges'):
+                self.defaultNewLangs.addItem(item)
+            else:
+                self.possibleDefaultNewLangs.addItem(item)
+        self.addDefaultNewLang.clicked.connect(self.addDefaultLang)
+        self.removeDefaultNewLang.clicked.connect(self.removeDefaultLang)
+
+    def addDefaultLang(self):
+        self.fromListToList(self.possibleDefaultNewLangs,self.defaultNewLangs)
+    def removeDefaultLang(self):
+        self.fromListToList(self.defaultNewLangs,self.possibleDefaultNewLangs)
+    def fromListToList(self,fromList,toList): 
+        for item in fromList.selectedItems():
+            row = fromList.row(item)
+            toList.addItem(
+                fromList.takeItem(row)
+            )
 
     def accept(self):
-        settings.setPref('displayLangauge',
+        settings.setPref('displayLanguage',
             self.defaultDisplayLanguage.itemData(
                 self.defaultDisplayLanguage.currentIndex()
             ).toPyObject()
         )
+
+        settings.setPref('defaultObjectLangauges',
+            [   str(self.defaultNewLangs.item(i).data(QtCore.Qt.UserRole).toPyObject())
+                for i in range(self.defaultNewLangs.count())    ]
+        )
+
+        settings.setPref('checkForUpdates', self.checkForUpdates.isChecked())
 
         QtGui.QDialog.accept(self)
 

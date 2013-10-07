@@ -99,6 +99,8 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         self.refreshExportMenu()
          
         self.actionBlame.triggered.connect(self.vanityBox)
+        self.actionAddLanguageGlobally.triggered.connect(self.addGlobalLanguage)
+        self.actionFileABug.triggered.connect(self.fileBug)
 
         self.selected = None
         self.mainWidget = None
@@ -108,7 +110,6 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         self.unsupportedFeature(self.dataElementDock)
         self.unsupportedFeature(self.actionRefreshImport)
         self.unsupportedFeature(self.actionRefreshExport)
-        #self.unsupportedFeature(self.menuSettings)
         self.unsupportedFeature(self.actionAutoRefreshPreviewer)
         self.unsupportedFeature(self.toolBarRichText)
 
@@ -124,8 +125,18 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         else:
             self.newModule()
 
+    def addGlobalLanguage(self):
+        newLang,success = SQBLWidgets.languagePicker.languagePickerDialog()
+        if success and newLang is not "":
+            self.model.addGlobalLanguage(newLang)
+
     def showPreferences(self):
         CanardPreferenceDialog.Dialog().exec_()
+
+    def fileBug(self):
+        import webbrowser
+        webbrowser.open('https://github.com/LegoStormtroopr/canard/issues')
+        
 
     def doTreeViewContextMenu(self, point):
         treeidx=self.treeView.indexAt(point)

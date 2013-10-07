@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-def languageCodeListPairs():
+def languageCodeListPairs(includeTopTen=True):
     common = []
-    for code,data in popularcodes.items():
-        common.append((code,"%s - %s / %s "%(code,data['name'],data['native'])))
-    common.sort()
+    if includeTopTen == True:
+        for code,data in popularcodes.items():
+            common.append((code,"%s - %s / %s "%(code,data['name'],data['native'])))
+        common.sort()
     allLangs = []
     for code,data in langcodes.items():
         try:
@@ -29,7 +30,7 @@ def languageCodeList():
     return common + allLangs
 
 def iso639CodeToString(code):
-    lang = knowncodes[code.lower()]
+    lang = knowncodes[str(code).lower()]
     return "%s / %s"%(lang['native'],lang['name'])
 
 # Following list taken from [http://en.wikipedia.org/wiki/Global_Internet_usage#Internet_users_by_language]

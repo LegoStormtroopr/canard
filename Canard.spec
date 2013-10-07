@@ -1,6 +1,6 @@
 # -*- mode: python -*-
 a = Analysis(['canard_main.py'],
-             pathex=['C:\\Users\\theodore\\Documents\\GitHub\\canard'],
+             pathex=['C:\\Users\\theodore\\My Documents\\GitHub\\canard'],
              hiddenimports=[],
              hookspath=None,
              runtime_hooks=None)
