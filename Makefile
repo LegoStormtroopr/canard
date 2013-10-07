@@ -29,6 +29,7 @@ widgets:
 	pyuic4 ui/questionText.ui -o SQBLWidgets/sqblUI/questionText.py
 	pyuic4 ui/question.ui -o SQBLWidgets/sqblUI/question.py
 	pyuic4 ui/population.ui -o SQBLWidgets/sqblUI/population.py
+	pyuic4 ui/preferencesDialog.ui -o SQBLWidgets/sqblUI/preferencesDialog.py
 	pyuic4 ui/statementText.ui -o SQBLWidgets/sqblUI/statementText.py
 	pyuic4 ui/stopModule.ui -o SQBLWidgets/sqblUI/stopModule.py
 	pyuic4 ui/statement.ui -o SQBLWidgets/sqblUI/statement.py

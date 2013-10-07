@@ -1,8 +1,7 @@
 from PyQt4 import QtCore, QtGui, QtWebKit
 import pydot
 import os, sys, StringIO
-from SQBLWidgets import sqblUI
-from SQBLWidgets import SQBLmodel
+from SQBLWidgets import sqblUI, SQBLmodel, CanardPreferenceDialog
 import SQBLWidgets
 import ConfigParser
 from lxml import etree
@@ -60,7 +59,7 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         self.treeView.setAcceptDrops(True)        
         self.treeView.header().setStretchLastSection(True)
         self.treeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.treeView.customContextMenuRequested.connect(self.doMenu)
+        self.treeView.customContextMenuRequested.connect(self.doTreeViewContextMenu)
         
         self.safeToRefresh = True
 
@@ -84,6 +83,7 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         self.actionRefeshPreviewers.triggered.connect(self.updateFlowchart)
         self.actionRefeshPreviewers.triggered.connect(self.refreshPreview)
         self.actionRefeshPreviewers.triggered.connect(self.refreshPreview)
+        self.actionShowPreferences.triggered.connect(self.showPreferences)
 
         self.autoFlowchartRefresh = True
         self.actionAutoRefreshFlowchart.toggled.connect(self.setAutoFlowchartRefresh)
@@ -108,7 +108,7 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         self.unsupportedFeature(self.dataElementDock)
         self.unsupportedFeature(self.actionRefreshImport)
         self.unsupportedFeature(self.actionRefreshExport)
-        self.unsupportedFeature(self.menuSettings)
+        #self.unsupportedFeature(self.menuSettings)
         self.unsupportedFeature(self.actionAutoRefreshPreviewer)
         self.unsupportedFeature(self.toolBarRichText)
 
@@ -124,7 +124,10 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         else:
             self.newModule()
 
-    def doMenu(self, point):
+    def showPreferences(self):
+        CanardPreferenceDialog.Dialog().exec_()
+
+    def doTreeViewContextMenu(self, point):
         treeidx=self.treeView.indexAt(point)
         menu = QtGui.QMenu(self)
         tag = self.model.data(treeidx,"element").tag

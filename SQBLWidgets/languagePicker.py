@@ -5,26 +5,13 @@ import isoLangCodes
 from lxml import etree
 
 def languagePickerDialog(title = "Enter Language", default = None):
-    common = []
-    for code,data in isoLangCodes.popularcodes.items():
-        common.append(code + " - " + data['name'] + " / " + data['native'])
-    common.sort()
-    allLangs = []
-    for code,data in isoLangCodes.langcodes.items():
-        try:
-            allLangs.append("" + code + " - " + data['name'] + " / " + data['native'])
-        except:
-            allLangs.append("" + code + " - ")
-    allLangs.sort()
-
-    names = [""] + common + allLangs
     lang,success = QtGui.QInputDialog.getItem(None,
         title,
         """Enter a <a href='http://en.wikipedia.org/wiki/ISO_639 '>2 letter ISO 639 Language Code ID</a>,<br>or select a common country from the list.<br>
             <br>
             This list of languages was selected from the <a href="en.wikipedia.org/wiki/Global_Internet_usage#Internet_users_by_language">Top 10 langauges used on the Internet</a>.<br>
             American English was added, due to the large number of native users within Information Technology.""",
-        names,
+        [""]+isoLangCodes.languageCodeList(),
         current = 0,
         editable = False,
         )

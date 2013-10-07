@@ -149,7 +149,7 @@ class SQBLUnnamedWidget(SQBLWidget):
         SQBLWidget.__init__(self,element,model)
         self.textType = textType
         self.textLanguages = []
-        self.activeLanguage = "en"
+        self.activeLanguage = str(Canard_settings.getPref('displayLangauge'))
 
         # If its uses a "components" section use that, otherwise pull straight from the element
         newStyle = ["QuestionModule"]
@@ -184,8 +184,9 @@ class SQBLUnnamedWidget(SQBLWidget):
         self.languagePicker.languageRemoved.connect(self.removeLanguage)
 
         if len(self.textLanguages) == 0:
-            newLang = unicode(Canard_settings.getPref('defaultObjectLangauge'))
-            self.addLanguage(newLang)
+            newLangs = unicode(Canard_settings.getPref('defaultObjectLangauges'))
+            for lang in newLangs:
+                self.addLanguage(lang.toPyObject())
         self.languagePicker.setLanguage(self.activeLanguage)
 
     def changeLanguage(self,lang):

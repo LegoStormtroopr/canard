@@ -1,5 +1,33 @@
 # -*- coding: utf-8 -*-
 
+def languageCodeListPairs():
+    common = []
+    for code,data in popularcodes.items():
+        common.append((code,"%s - %s / %s "%(code,data['name'],data['native'])))
+    common.sort()
+    allLangs = []
+    for code,data in langcodes.items():
+        try:
+            allLangs.append((code,"%s - %s / %s "%(code,data['name'],data['native'])))
+        except:
+            allLangs.append((code,"%s - %s"%(code,data['name'])))
+    allLangs.sort()
+    return common + allLangs
+
+def languageCodeList():
+    common = []
+    for code,data in popularcodes.items():
+        common.append(code + " - " + data['name'] + " / " + data['native'])
+    common.sort()
+    allLangs = []
+    for code,data in langcodes.items():
+        try:
+            allLangs.append("" + code + " - " + data['name'] + " / " + data['native'])
+        except:
+            allLangs.append("" + code + " - ")
+    allLangs.sort()
+    return common + allLangs
+
 def iso639CodeToString(code):
     lang = knowncodes[code.lower()]
     return "%s / %s"%(lang['native'],lang['name'])

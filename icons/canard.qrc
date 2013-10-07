@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>actions/preferences-system-2.png</file>
     <file>actions/insert-text-2.png</file>
     <file>Canard_icon.png</file>
     <file>Branch.png</file>
@@ -10,6 +11,8 @@
     <file>Statement.png</file>
   </qresource>
   <qresource prefix="file">
+    <file>actions/applications-development-translation.png</file>
+    <file>actions/document-open-recent-3.png</file>
     <file>actions/insert-text-2.png</file>
     <file>actions/view-right-new-2.png</file>
     <file>actions/view-sidetree-3.png</file>
