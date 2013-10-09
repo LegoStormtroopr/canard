@@ -10,7 +10,7 @@ AppSettings = QtCore.QSettings("sqbl.org", "Canard-App")
 
 from SQBLWidgets.SQBLmodel import _ns
 
-VERSION = "0.2.0B"
+VERSION = "0.2.1B"
 CRITICAL_SIZE = 50 # Number of nodes before refreshes get slow.
 
 _APPWINDOWTITLE = "Canard Question Module Editor"
@@ -174,7 +174,7 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
 </body>
 </html>
 """.format(version=VERSION)
-        QtGui.QMessageBox.about(self,"About Virgil UI", vanityText )
+        QtGui.QMessageBox.about(self,"About Canard Question Module Editor", vanityText )
 
     def refreshImportMenu(self):
         self.refreshPluginMenu("import", self.menuImport)
