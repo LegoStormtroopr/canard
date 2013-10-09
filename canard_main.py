@@ -53,7 +53,7 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
 #                self.open(f.read())
 
         self.treeView.clicked.connect(self.setMainView)
-        self.newItemsList.clicked.connect(self.setMainView)
+        #self.newItemsList.clicked.connect(self.setMainView)
         self.treeView.header().setResizeMode(0,QtGui.QHeaderView.ResizeToContents)
 #        self.treeView.header().setStretchLastSection(False) # Not sure why I added this, so I'll leave it here for a little while. Its a UI thing anyway.
         self.treeView.setAcceptDrops(True)        
