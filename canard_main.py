@@ -91,6 +91,8 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
 
         #Connect more actions
         self.actionCreateNewWordsub.triggered.connect(self.addWordSub)
+        self.actionNewDerivedDataItem.triggered.connect(self.addDerivedDataItem)
+        self.actionNewCalculatedDataItem.triggered.connect(self.addCalculatedDataItem)
 
         # Connect import/export refreshers
         self.actionRefreshImport.triggered.connect(self.refreshImportMenu)
@@ -146,11 +148,17 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         print tag
         if tag == "WordSubstitutions":
             menu.addAction(self.actionCreateNewWordsub)
+        if tag == "DerivedDataItems":
+            menu.addAction(self.actionNewDerivedDataItem)
+            menu.addAction(self.actionNewCalculatedDataItem)
         x = menu.exec_(self.treeView.mapToGlobal(point))
-        print x
 
     def addWordSub(self):
         self.model.addWordSub()
+    def addDerivedDataItem(self):
+        self.model.addDerivedDataItem()
+    def addCalculatedDataItem(self):
+        self.model.addCalculatedDataItem()
 
     def vanityBox(self):
         vanityText = """<html>

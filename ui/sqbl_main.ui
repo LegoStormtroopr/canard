@@ -514,6 +514,9 @@ QDockWidget &gt; * {
        <property name="alternatingRowColors">
         <bool>true</bool>
        </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
       </widget>
      </item>
     </layout>
@@ -689,7 +692,7 @@ QDockWidget &gt; * {
      <normaloff>:/icons/Canard_icon.png</normaloff>:/icons/Canard_icon.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;About...</string>
+    <string>&amp;About Canard...</string>
    </property>
    <property name="toolTip">
     <string>About Canard</string>
@@ -822,6 +825,19 @@ QDockWidget &gt; * {
    </property>
    <property name="text">
     <string>File a bug...</string>
+   </property>
+  </action>
+  <action name="actionNewDerivedDataItem">
+   <property name="text">
+    <string>New Derived Data Item</string>
+   </property>
+  </action>
+  <action name="actionNewCalculatedDataItem">
+   <property name="text">
+    <string>New Calculated Data Item</string>
+   </property>
+   <property name="toolTip">
+    <string>New Calculated Data Item</string>
    </property>
   </action>
  </widget>

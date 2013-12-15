@@ -75,17 +75,44 @@
             <sqbl:ModuleLogic>
                 <xsl:choose>
                     <xsl:when test="d:DataCollection/d:Instrument">
+                        <sqbl:Statement name="Sys_message">
+                            <sqbl:TextComponent xml:lang="en">
+                                <sqbl:StatementText>Transforming Instrument</sqbl:StatementText>
+                            </sqbl:TextComponent>
+                        </sqbl:Statement>
                         <xsl:apply-templates select="d:DataCollection/d:Instrument" />
                     </xsl:when>
                     <xsl:when test="d:DataCollection/d:ControlConstructScheme">
+                        <sqbl:Statement name="Sys_message">
+                            <sqbl:TextComponent xml:lang="en">
+                                <sqbl:StatementText>Transforming ControlConstructScheme</sqbl:StatementText>
+                            </sqbl:TextComponent>
+                        </sqbl:Statement>
                         <xsl:apply-templates select="d:DataCollection/d:ControlConstructScheme" />
                     </xsl:when>
-                    <xsl:when test="//d:ControlConstructScheme">
-                        <xsl:apply-templates select="//d:ControlConstructScheme" />
-                    </xsl:when>
                     <xsl:when test="d:DataCollection/d:QuestionScheme">
+                        <sqbl:Statement name="Sys_message">
+                            <sqbl:TextComponent xml:lang="en">
+                                <sqbl:StatementText>Transforming QuestionScheme</sqbl:StatementText>
+                            </sqbl:TextComponent>
+                        </sqbl:Statement>
                         <xsl:apply-templates select="d:DataCollection/d:QuestionScheme" />
                     </xsl:when>
+                    <xsl:when test="//d:QuestionScheme">
+                        <sqbl:Statement name="Sys_message">
+                            <sqbl:TextComponent xml:lang="en">
+                                <sqbl:StatementText>Transforming ANY QuestionScheme </sqbl:StatementText>
+                            </sqbl:TextComponent>
+                        </sqbl:Statement>
+                        <xsl:apply-templates select="//d:QuestionScheme" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <sqbl:Statement name="None_found">
+                            <sqbl:TextComponent xml:lang="en">
+                                <sqbl:StatementText>No Transformable DDI Objects found</sqbl:StatementText>
+                            </sqbl:TextComponent>
+                        </sqbl:Statement>
+                    </xsl:otherwise>
                 </xsl:choose>
             </sqbl:ModuleLogic>
         </sqbl:QuestionModule>

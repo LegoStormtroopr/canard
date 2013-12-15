@@ -283,6 +283,12 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
         self.update()
 
 
+    def addBooleanResponse(self):
+        element = etree.Element("{%s}Boolean"%(_namespaces['s']))
+        self.responses.append(element)
+        responseField = Responses.Boolean(element,self.model) 
+        self.responseTabs.addTab(responseField,"Boolean")
+
     def addNumericResponse(self):
         element = etree.Element("{%s}Number"%(_namespaces['s']))
         self.responses.append(element)
@@ -316,10 +322,12 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
         addNum = arbMenu.addAction("Numeric Response")
         addText = arbMenu.addAction("Text Response")
         addCode = arbMenu.addAction("CodeList Response")
+        addBool = arbMenu.addAction("Boolean Response")
         
         addNum.triggered.connect(self.addNumericResponse)
         addText.triggered.connect(self.addTextResponse)
         addCode.triggered.connect(self.addCodeListResponse)
+        addBool.triggered.connect(self.addBooleanResponse)
         arb.setMenu(arbMenu)
 
         self.responseTabs.setCornerWidget(arb)
@@ -337,6 +345,10 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
                 responseField = Responses.Text(response,self.model) 
                 #self.responseType.setCurrentIndex(0)
                 tabName = "Text"
+            elif response.tag == _ns("s","Boolean"):
+                responseField = Responses.Boolean(response,self.model) 
+                #self.responseType.setCurrentIndex(0)
+                tabName = "Boolean"
             if responseField is not None:
                 self.responseTabs.addTab(responseField,tabName)
         self.responseTabs.tabCloseRequested.connect(self.removeResponse)

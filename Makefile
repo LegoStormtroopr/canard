@@ -6,7 +6,7 @@ windows:
 	pyuic4 ui/sqbl_main.ui -o SQBLWidgets/sqblUI/sqbl_main.py
 
 widgets: 
-	pyuic4 ui/SQBL_module_pane.ui -o SQBLWidgets/sqblUI/SQBL_module_pane.py
+	pyuic4 ui/SQBL_module_pane.ui -o SQBLWidgets/sqblUI/module_pane.py
 	pyuic4 ui/branch.ui -o SQBLWidgets/sqblUI/branch.py
 	pyuic4 ui/bulkQuestionEditor.ui -o SQBLWidgets/sqblUI/bulkQuestionEditor.py
 	pyuic4 ui/conditionalTree.ui -o SQBLWidgets/sqblUI/conditionalTree.py
@@ -18,6 +18,7 @@ widgets:
 	pyuic4 ui/moduleLogic.ui -o SQBLWidgets/sqblUI/moduleLogic.py
 	pyuic4 ui/newLanguageTab.ui -o SQBLWidgets/sqblUI/newLanguageTab.py
 	pyuic4 ui/repositorySearch.ui -o SQBLWidgets/sqblUI/repositorySearch.py
+	pyuic4 ui/responseBoolean.ui -o SQBLWidgets/sqblUI/responseBoolean.py
 	pyuic4 ui/responseCodeList.ui -o SQBLWidgets/sqblUI/responseCodeList.py
 	pyuic4 ui/responseGeneric.ui -o SQBLWidgets/sqblUI/responseGeneric.py
 	pyuic4 ui/responseNumber.ui -o SQBLWidgets/sqblUI/responseNumber.py

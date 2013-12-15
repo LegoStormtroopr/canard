@@ -342,3 +342,19 @@ class Text(SQBLResponseObject, sqblUI.responseText.Ui_Form):
         self.connectAddRemoveLanguages(self.addLanguage,self.removeLanguage,self.languages)
         self.configureLanguages(self.languages)
 
+
+class Boolean(SQBLResponseObject, sqblUI.responseBoolean.Ui_Form):
+    def __init__(self,element,model):
+        SQBLResponseObject.__init__(self,element,model)
+
+
+        self.initialiseRestraintFields( tagname = "Hint",
+                defaultElement = etree.fromstring("<Hint xmlns='%s' />"% _namespaces['s']),
+                checkbox = self.hasDisplayHint,
+                languageCombo = self.languages,
+                textField = self.displayHint,
+            )
+
+        # Do this as a last step, to select a display language
+        self.connectAddRemoveLanguages(self.addLanguage,self.removeLanguage,self.languages)
+        self.configureLanguages(self.languages)

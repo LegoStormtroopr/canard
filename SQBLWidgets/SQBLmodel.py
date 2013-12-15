@@ -127,11 +127,11 @@ class QuestionModule(QtCore.QAbstractItemModel):
             #data.insert(0,di)
         else:
             di = di[0]
-        derivedDI = SQBLModuleUnnamedItem(di,module,
+        self.derivedDI = SQBLModuleUnnamedItem(di,module,
                 label=u"Derived Data Items",
                 icon=QtGui.QIcon("icons/Derived.png")
                 )
-        module.appendChild(derivedDI)
+        module.appendChild(self.derivedDI)
 
         sm = data.xpath('./s:Submodules',namespaces=_namespaces)
         if len(sm) == 0:
@@ -163,6 +163,21 @@ class QuestionModule(QtCore.QAbstractItemModel):
         element = etree.fromstring(newWordSub(name))
         w.element.append(element)
         w.appendChild(SQBLModuleNamedItem(element,w)) 
+        self.emit(QtCore.SIGNAL('layoutChanged()'))
+    def addDerivedDataItem(self):
+        di = self.derivedDI
+        name = "NewDerivedItem_%d"%(len(di.childItems)+1)
+        element = etree.fromstring(newDerivedDataItem(name))
+        self.addGenericDataItem(element)
+    def addCalculatedDataItem(self):
+        di = self.derivedDI
+        name = "NewCalculatedItem_%d"%(len(di.childItems)+1)
+        element = etree.fromstring(newCalculatedDataItem(name))
+        self.addGenericDataItem(element)
+    def addGenericDataItem(self,item):
+        di = self.derivedDI
+        di.element.append(item)
+        di.appendChild(SQBLModuleNamedItem(item,di)) 
         self.emit(QtCore.SIGNAL('layoutChanged()'))
 
     # Change the object with the oldname to the newname
@@ -365,10 +380,11 @@ class QuestionModule(QtCore.QAbstractItemModel):
             texts = [] 
             for q in questions:
                 name = q.get("name")
-                text = etree.tostring(q.xpath("./s:TextComponent[@xml:lang='%s']/s:QuestionText"%(lang),namespaces=_namespaces)[0], method="text")
-                if text is None:
+                text = q.xpath("./s:TextComponent[@xml:lang='%s']/s:QuestionText"%(lang),namespaces=_namespaces)
+                if len(text) == 0:
                     text = "No question text"
                 else:
+                    text = etree.tostring(text[0], method="text")
                     #Strip and normalise all white space, just for display
                     import re
                     text = text.strip()
@@ -468,6 +484,7 @@ class SQBLModuleTreeItem(TreeItem):
         #Most SQBL things can't be dropped on, so define those that can
         if self.element.tag in (
                _ns("s","Branch"),
+               _ns("s","ForLoop"),
                _ns("s","ModuleLogic"),
                _ns("s","QuestionGroup"),
            ):
@@ -493,6 +510,8 @@ class SQBLModuleTreeItem(TreeItem):
             # We actually need to put the item in the BranchLogic element just under here.
             # There is only, so just take the first
             dropSpot = self.element.xpath("./s:GroupedQuestions",namespaces=_namespaces)[0]
+        elif self.element.tag == _ns("s","ForLoop"):
+            dropSpot = self.element.xpath("./s:LoopedLogic",namespaces=_namespaces)[0]
         if position == -1:
             self.childItems.append(child)
             dropSpot.append(child.element)
@@ -579,15 +598,15 @@ def newQuestion(name,lang):
 
 def newStatement(name):
     return """
-        <Statement xmlns="%s" name="%s_$numItems"/>
-    """%(_namespaces['s'],name)
+        <Statement xmlns="{s}" name="{name}_$numItems"/>
+    """.format(s=_namespaces['s'],name=name)
 
 def newForLoop(name):
     return """
-        <ForLoop xmlns="%s" name="%s_$numItems" question="">
+        <ForLoop xmlns="{s}" name="{name}_$numItems" question="">
             <LoopedLogic></LoopedLogic>
         </ForLoop>
-    """%(_namespaces['s'],name)
+    """.format(s=_namespaces['s'],name=name)
 
 def newBranch(name):
     return """
@@ -601,6 +620,10 @@ def newBranch(name):
 
 def newWordSub(name):
     return """<WordSub xmlns="{s}" name="{name}"/>""".format( s=_namespaces['s'],name = name)
+def newDerivedDataItem(name):
+    return """<DerivedDataItem xmlns="{s}" name="{name}"/>""".format( s=_namespaces['s'],name = name)
+def newCalculatedDataItem(name):
+    return """<CalculatedDataItem xmlns="{s}" name="{name}"/>""".format( s=_namespaces['s'],name = name)
 
 def newQuestionGroup(name,question="QuestionID"):
     # We allow this to be non-conformant by not including a condition, and assume the user will 'do the right thing'
