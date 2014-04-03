@@ -135,9 +135,10 @@
 	</xsl:template>
 	<xsl:template match="sqbl:ResponseType/sqbl:Number" mode="makeQuestionScheme">
 		<d:NumericDomain>
-			<xsl:if test="./sqbl:Step">
-				<xsl:attribute name="interval" select="sqbl:Step/@value"/>
-			</xsl:if>
+			<!-- xsl:if test="./sqbl:Step">
+				Steps are no longer decimal, so we can't output them.
+				<xsl:attribute name="interval"><xsl:value-of select="sqbl:Step/@value"/></xsl:attribute>
+			</xsl:if -->
 			<r:NumberRange>
 			<xsl:if test="./sqbl:Minimum">
 				<xsl:element name="r:Low"><xsl:value-of select="sqbl:Minimum/@value"/></xsl:element>
