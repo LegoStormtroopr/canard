@@ -490,7 +490,7 @@ QDockWidget &gt; * {
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Drag from the list below in to the flow logic to add new parts to a question module.</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Drag from the list below in to the &lt;span style=&quot; font-weight:600;&quot;&gt;Flow Logic&lt;/span&gt; to add new parts to a question module.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>

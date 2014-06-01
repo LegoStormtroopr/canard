@@ -397,12 +397,18 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
             if a.tag in [_ns('s','Branch'),_ns('s','ForLoop'),_ns('s','QuestionModule')]
           ]):
             # This is concatenated in reverse, as the ancestors come in order from the question back to the root, and we want the opposite.
-            resps = a.xpath("./s:TextComponent/s:TargetRespondent",namespaces=_namespaces)
+
+            # TODO: Below is a kludge until text components are all normalised.
+            #   TextComoinents 
+            if a.tag == _ns('s','QuestionModule'):
+                resps = a.xpath("./s:TextComponents/s:TextComponent/s:TargetRespondent",namespaces=_namespaces)
+            else:
+                resps = a.xpath("./s:TextComponent/s:TargetRespondent",namespaces=_namespaces)
             text = "   "*i
             if len(resps) > 0 and resps[0].text is not None:
                 text = text + resps[0].text
             else:
-                text = text + "Undescribed population"
+                text = text + "Undescribed Population"
             text = text + " (" + a.get('name') + ")"
             self.targetPopulation.addItem(text)
 
@@ -981,7 +987,9 @@ class SQBLTextComponentObject(SQBLWidget):
                 else:
                     QtGui.QTextEdit.insertFromMimeData(s,q) 
             UiField.insertFromMimeData = insertFromMimeData
-            SQBLutil.XMLHighlighter(UiField.document())
+            # Assign highlighter below as its destroyed in Python x86 32bit.
+            # See: http://qt-project.org/forums/viewthread/26371
+            self.highlighter = SQBLutil.XMLHighlighter(UiField.document())
         
         def updateTagName(str=None):
             elem = self.element.xpath("./s:%s" % tagname,namespaces=_namespaces)

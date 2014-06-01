@@ -10,7 +10,7 @@ AppSettings = QtCore.QSettings("sqbl.org", "Canard-App")
 
 from SQBLWidgets.SQBLmodel import _ns
 
-VERSION = "0.2.1B"
+VERSION = "0.2.2B"
 CRITICAL_SIZE = 50 # Number of nodes before refreshes get slow.
 
 _APPWINDOWTITLE = "Canard Question Module Editor"
@@ -145,7 +145,6 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         menu = QtGui.QMenu(self)
         tag = self.model.data(treeidx,"element").tag
         tag = tag.replace("{%s}"%SQBLmodel._namespaces['s'],"")
-        print tag
         if tag == "WordSubstitutions":
             menu.addAction(self.actionCreateNewWordsub)
         if tag == "DerivedDataItems":
@@ -260,7 +259,6 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
 
     def setAutoFlowchartRefresh(self,state):
         state = True if state is True else False
-        print state
         self.autoFlowchartRefresh = state
 
     def setSafeAutoFlowchartRefresh(self,state):
@@ -470,7 +468,6 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
         x = self.model.totalChildren()
         # if the model is too big don't allow automatic updates
         if x > CRITICAL_SIZE: return
-        print self.autoFlowchartRefresh
         if not self.autoFlowchartRefresh: return
         self.updateFlowchart()
         
