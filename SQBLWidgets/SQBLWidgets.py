@@ -354,9 +354,13 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
         self.responseTabs.tabCloseRequested.connect(self.removeResponse)
 
     def removeResponse(self,index):
+        h = self.responseTabs.cornerWidget().height()
         self.responses.remove(self.responseTabs.widget(index).element)
         self.responseTabs.removeTab(index)
         self.update()
+        if len(self.responses) == 0:
+            self.responseTabs.cornerWidget().setMinimumHeight(h)
+            self.responseTabs.setMinimumHeight(h)
 
     def changeDataElementURI(self):
         self.element.set('dataElementReference',
