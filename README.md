@@ -1,38 +1,39 @@
 Canard Question Module Editor
 ======
 
-Canard is a [what-you-see-is-what-you-mean](http://en.wikipedia.org/wiki/WYSIWYM) editor that allows a questionnaire
-designer to describe their intent behind a data collection instrument, but also allows them to see a real-time live
-example of what that specification may look like when presented to a respondent.
+Canard is a [what-you-see-is-what-you-mean](http://en.wikipedia.org/wiki/WYSIWYM) questionnaire application that allows researchers and questionnaire
+designers to describe the specification of data collection instrument, while showing a real-time live
+example of what a generated questionnaire may look like when presented to a respondent.
 
-Canard also acts a a prototype tool for illustrating (and testing) the principles of Structured
-Questionnaire Design, using the [Simple Questionnaire Building Language](http://sqbl.org) as its
-management format. By using the cutdown SQBL format, Canard remains agile requiring network connectivity
+Canard is able to provide quick-prototyping for questionnaires and surveys by implementing [the principles of Structured
+Questionnaire Design](http://sqbl.org/wiki/index.php/Structured_Questionnaire_Design). Internally, Canard uses the [Simple Questionnaire Building Language](http://sqbl.org) as its internal data model, while also conforming to the XML standards of the Data Documentation Initiative. By using the simplified SQBL format, Canard remains agile requiring network connectivity
 only when connecting modules together, while allowing an entire question module to be captured within a single document.
 
 A series of [tutorial videos](http://bit.ly/CanardVideos) are available on youtube showing how to use the software.
 
 
-Features
+Current features
 -------------
-Currently functional in this release:
  - Dynamic text and word substitutions in question text and statements
  - Nested branching and complex routing within surveys
  - Three types of basic response type:
   - Text - with optional enforcement of minimum and maximum response length
   - Number - with optional enforcement of minimum and maximum values, with required step values
   - Codelists - with the ability to indicate a minimum and maximum number of choices
- - While also allowing for complex response types:
+  - Binary (yes/no) - for simple presentation of yes/no, on/off response options.
+ - Grouping for complex response types:
   - Question Groups - allow for tightly linked questions with different responses to be brought together.
-  - Individual questions can have subquestions and multiple responses to capture complex lists and grids of responses quickly.
+  - Subquestions to support repeated capture of similar responses
+  - Multiple responses against a single question
+  - Combinations of subquestions and multiple responses to capture **complex question grids**.
  - Live preview of question routing and example form instances using Graphviz and XForms.
- - Plug-in support to extend *import and export* functionality
-  - This release includes plugins for [DDI3.1](http://www.ddialliance.org/Specification/DDI-Lifecycle/3.1/) import and export
- - **Multilingual** settings to insert and manage multiple languages in the same question module 
+ - XSLT Plug-in support to extend *import and export* functionality
+  - This release includes plugins for [DDI3.1](http://www.ddialliance.org/Specification/DDI-Lifecycle/3.1/) and DDI3.2 import and export
+ - Multilingual support for managing multiple languages in the same question module.
 
 How to install (Windows)
 -------------
-1. Download the above executable
+1. Download the [most current release](http://bit.ly/canard_releases)
 2. Extract to a location of your choosing.
 3. (Optional) [Install Graphviz](http://www.graphviz.org/), however without this installed the flowchart panel be able to provide illustrations of the logical routing.
 
