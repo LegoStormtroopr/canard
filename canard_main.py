@@ -252,6 +252,29 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
             elif runType == "export":
                 with open(filename,"w") as f:
                     f.write(out)
+        if extension in ['py']:
+            sys.path.append('./%s/'%importDir)
+            import plugin
+            import imp
+            plugin = imp.load_source(bf.rsplit(".",1)[0],'./%s/%s'%(importDir,bf))
+            try:
+                result = plugin.run('World')
+            except Exception as err:
+                import traceback
+                blame = config.get('SQBL Plugin',"Author")
+                exc_type, exc_value = sys.exc_info()[:2]
+                errorMsg = "\n".join([
+                            "<b>'%s' encountered an error while running.</b>" % name,
+                            "If this occurs again, contact the plugin author",
+                            "     - %s" % blame,
+                            "",
+                            "The error is included below:",
+                            "",
+                       ]) + traceback.format_exc(limit=3) #eption(exc_type, exc_value, exc_traceback,limit=3)
+                errorMsg = errorMsg.replace("\n","<br>")
+                QtGui.QMessageBox.critical(self,
+                    "An error occured while running the plugin", errorMsg
+                    )
 
     def unsupportedFeature(self,item):
         item.setVisible(False) # Hides instantly
