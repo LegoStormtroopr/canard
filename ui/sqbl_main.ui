@@ -577,13 +577,18 @@ QDockWidget &gt; * {
     </property>
     <widget class="QMenu" name="menuTogglePanes">
      <property name="title">
-      <string>&amp;Show / hide panes...</string>
+      <string>Show / hide panes...</string>
      </property>
-     <addaction name="separator"/>
+    </widget>
+    <widget class="QMenu" name="menuToggleToolbars">
+     <property name="title">
+      <string>Show / hide toolbars...</string>
+     </property>
     </widget>
     <addaction name="actionAddLanguageGlobally"/>
     <addaction name="actionShowPreferences"/>
     <addaction name="menuTogglePanes"/>
+    <addaction name="menuToggleToolbars"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSettings"/>

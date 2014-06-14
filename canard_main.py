@@ -143,15 +143,19 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         webbrowser.open('https://github.com/LegoStormtroopr/canard/issues')
         
     def updatePaneMenu(self):
-        
-        panes = [
+        toolbars = [
                     self.toolbarMultilingual,
                     self.toolbarPreviewOptions,
                     self.toolbarFile,
+                ]
+        panes = [
                     self.panePreview,
                     self.paneFlowchart,
                     self.paneComponents,
                 ]
+
+        for tb in toolbars:
+            self.menuToggleToolbars.addAction(tb.toggleViewAction())
 
         for pane in panes:
             self.menuTogglePanes.addAction(pane.toggleViewAction())
