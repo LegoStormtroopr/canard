@@ -113,12 +113,15 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         self.unsupportedFeature(self.actionRefreshImport)
         self.unsupportedFeature(self.actionRefreshExport)
         self.unsupportedFeature(self.actionAutoRefreshPreviewer)
-        self.unsupportedFeature(self.toolBarRichText)
+        self.unsupportedFeature(self.toolbarRichText)
 
         self.restoreGeometry(
                 AppSettings.value("MainWindow/Geometry").toByteArray())
         #. app's State include Geometries of named toolbars and dockables:
         self.restoreState(AppSettings.value("MainWindow/State").toByteArray())
+
+        #This comes after restoring the geometry as we need to know whats visible.
+        self.updatePaneMenu()
 
 
         # Everything is set up, lets make a new file...
@@ -139,6 +142,19 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         import webbrowser
         webbrowser.open('https://github.com/LegoStormtroopr/canard/issues')
         
+    def updatePaneMenu(self):
+        
+        panes = [
+                    self.toolbarMultilingual,
+                    self.toolbarPreviewOptions,
+                    self.toolbarFile,
+                    self.panePreview,
+                    self.paneFlowchart,
+                    self.paneComponents,
+                ]
+
+        for pane in panes:
+            self.menuTogglePanes.addAction(pane.toggleViewAction())
 
     def doTreeViewContextMenu(self, point):
         treeidx=self.treeView.indexAt(point)
