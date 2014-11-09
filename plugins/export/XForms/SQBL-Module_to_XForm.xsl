@@ -7,7 +7,7 @@
 	xmlns:skip="http://legostormtoopr/skips" xmlns:cfg="rml:RamonaConfig_v1"
 	exclude-result-prefixes="qwac exslt skip cfg" extension-element-prefixes="exslt">
 	<!-- Import the XSLT for turning a responseML document into the skip patterns needed for conditional questions. -->
-	<xsl:import href="SQBL_to_Skips.xsl" />
+	<xsl:import href="../SQBL_to_Skips.xsl" />
 
 	<!-- We are outputing XHTML so the output method will be XML, not HTML -->
 	<xsl:output method="xml" />

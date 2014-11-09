@@ -166,7 +166,7 @@ pip-log.txt
 *.pyc
 *~
 # Don't add the compiled UI files
-SQBLWidgets/sqblUI/
+#SQBLWidgets/sqblUI/
 
 # Don't add the symlinked folders
 roxy
