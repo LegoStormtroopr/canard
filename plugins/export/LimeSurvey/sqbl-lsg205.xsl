@@ -23,41 +23,94 @@
 		<xsl:apply-templates select="sqbl:QuestionModule" ></xsl:apply-templates>
 	</xsl:template>
 	<xsl:template match="sqbl:QuestionModule">
-		<questionnaire xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="1">
-
-			<title><xsl:value-of select="./sqbl:TextComponents/sqbl:TextComponent[@xml:lang=$lang]/sqbl:Title"></xsl:value-of>position()</title>
-			<investigator>
-				<name>
-					<firstName></firstName>
-					<lastName></lastName>
-				</name>
-				<website>http://www.deakin.edu.au/dcarf/</website>
-			</investigator>
-			<dataCollector>
-				<name>
-					<firstName></firstName>
-					<lastName></lastName>
-				</name>
-			</dataCollector>
-			
-			<section>
-				<xsl:apply-templates select="//sqbl:Question"/>
-			</section>			
-		</questionnaire>
+		<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="1">
+			<LimeSurveyDocType>Group</LimeSurveyDocType>
+			<DBVersion>177</DBVersion>
+			<languages><language><xsl:value-of select="$lang"/></language></languages>
+			<groups>
+				<fields>
+					<fieldname>gid</fieldname>
+					<fieldname>sid</fieldname>
+					<fieldname>group_name</fieldname>
+					<fieldname>group_order</fieldname>
+					<fieldname>description</fieldname>
+					<fieldname>language</fieldname>
+					<fieldname>randomization_group</fieldname>
+					<fieldname>grelevance</fieldname>
+				</fields>
+				<rows>
+					<row>
+						<gid>40</gid>
+						<sid>641191</sid>
+						<group_name><xsl:value-of select="sqbl:TextComponents/sqbl:TextComponent[@xml:lang=$lang]/sqbl:Title"/></group_name>
+						<group_order>37</group_order>
+						<description><xsl:apply-templates select="sqbl:TextComponents/sqbl:TextComponent[@xml:lang=$lang]/sqbl:LongName" /></description>
+						<language>en</language>
+						<randomization_group/>
+						<grelevance/>
+					</row>
+				</rows>
+			</groups>
+			<questions>
+				<fields>
+					<fieldname>qid</fieldname>
+					<fieldname>parent_qid</fieldname>
+					<fieldname>sid</fieldname>
+					<fieldname>gid</fieldname>
+					<fieldname>type</fieldname>
+					<fieldname>title</fieldname>
+					<fieldname>question</fieldname>
+					<fieldname>preg</fieldname>
+					<fieldname>help</fieldname>
+					<fieldname>other</fieldname>
+					<fieldname>mandatory</fieldname>
+					<fieldname>question_order</fieldname>
+					<fieldname>language</fieldname>
+					<fieldname>scale_id</fieldname>
+					<fieldname>same_default</fieldname>
+					<fieldname>relevance</fieldname>
+				</fields>
+				<rows>
+					<xsl:apply-templates select="//sqbl:Question"/>
+				</rows>
+			</questions>			
+		</document>
 	</xsl:template>
 	<xsl:template match="sqbl:Question">
-		<question>
-			<text>
-				<xsl:apply-templates select="sqbl:TextComponent[@xml:lang=$lang]/sqbl:QuestionText" />
-			</text>
-			<directive>
-				<position>during</position>
-				<text><xsl:apply-templates select="sqbl:TextComponent[@xml:lang=$lang]/sqbl:QuestionIntent" /></text>
-				<administration>interviewer</administration>
-			</directive>
-			<xsl:apply-templates select="sqbl:SubQuestions/sqbl:SubQuestion" />
-			<xsl:apply-templates select="sqbl:ResponseType/*" mode="makeResponse"/>
-		</question>
+		<row>
+			<qid><xsl:value-of select="@name" /></qid>
+			<parent_qid>0</parent_qid>
+			<sid>641191</sid>
+			<gid>40</gid>
+			<type>
+				<xsl:if test="count(./sqbl:ResponseType) = 1">
+					<xsl:choose>
+						<xsl:when test="./sqbl:ResponseType/sqbl:Boolean"><xsl:text>Y</xsl:text></xsl:when>
+						<xsl:when test="./sqbl:ResponseType/sqbl:Text/@displayType = 'short'"><xsl:text>S</xsl:text></xsl:when>
+						<xsl:when test="./sqbl:ResponseType/sqbl:Text/@displayType = 'medium'"><xsl:text>T</xsl:text></xsl:when>
+						<xsl:when test="./sqbl:ResponseType/sqbl:Text/@displayType = 'long'"><xsl:text>U</xsl:text></xsl:when>
+						<xsl:when test="./sqbl:ResponseType/sqbl:Number"><xsl:text>N</xsl:text></xsl:when>
+						<xsl:otherwise><xsl:text>S</xsl:text></xsl:otherwise>
+					</xsl:choose>
+				</xsl:if>
+			</type>
+			<title><xsl:value-of select="translate(@name,'-_','')" /></title>
+			<question><xsl:apply-templates select="sqbl:TextComponent[@xml:lang=$lang]/sqbl:QuestionText" /></question>
+			<preg/>
+			<help><xsl:apply-templates select="sqbl:TextComponent[@xml:lang=$lang]/sqbl:QuestionIntent" /></help>
+			<other>N</other>
+			<mandatory>
+				<xsl:choose>
+					<xsl:when test="./sqbl:ResponseType/@canRefuse"><xsl:text>N</xsl:text></xsl:when>
+					<xsl:otherwise><xsl:text>N</xsl:text></xsl:otherwise>
+				</xsl:choose>
+			</mandatory>
+			<question_order><xsl:value-of select="position()" /></question_order>
+			<language><xsl:value-of select="$lang"/></language>
+			<scale_id>0</scale_id>
+			<same_default>0</same_default>
+			<relevance>1</relevance>
+		</row>
 	</xsl:template>
 	<xsl:template match="sqbl:SubQuestion">
 		<xsl:variable name="parentQuestion" select="../../@name"/>

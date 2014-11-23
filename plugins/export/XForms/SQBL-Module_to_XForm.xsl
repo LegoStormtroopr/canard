@@ -54,7 +54,7 @@
 				<title>
 					<xsl:apply-templates select="sqbl:QuestionModule/sqbl:TextComponents/sqbl:TextComponent/sqbl:Title" />
 				</title>
-				<!-- Link to the CSS for rendering the form - ->
+				<!-- Link to the CSS for rendering the form -->
 				<!-- Xforms Data model and bindings, including the ResponseML data instance. -->
 				<xf:model>
 					<xf:instance id="{//sqbl:QuestionModule/@name}">
