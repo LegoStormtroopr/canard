@@ -20,9 +20,11 @@ widgets:
 	pyuic4 ui/repositorySearch.ui -o SQBLWidgets/sqblUI/repositorySearch.py
 	pyuic4 ui/responseBoolean.ui -o SQBLWidgets/sqblUI/responseBoolean.py
 	pyuic4 ui/responseCodeList.ui -o SQBLWidgets/sqblUI/responseCodeList.py
+	pyuic4 ui/responseDate.ui -o SQBLWidgets/sqblUI/responseDate.py
 	pyuic4 ui/responseGeneric.ui -o SQBLWidgets/sqblUI/responseGeneric.py
 	pyuic4 ui/responseNumber.ui -o SQBLWidgets/sqblUI/responseNumber.py
 	pyuic4 ui/responseText.ui -o SQBLWidgets/sqblUI/responseText.py
+	pyuic4 ui/responseTime.ui -o SQBLWidgets/sqblUI/responseTime.py
 	pyuic4 ui/responseTab.ui -o SQBLWidgets/sqblUI/responseTab.py
 	pyuic4 ui/questionGroup.ui -o SQBLWidgets/sqblUI/questionGroup.py
 	pyuic4 ui/questionModule.ui -o SQBLWidgets/sqblUI/questionModule.py

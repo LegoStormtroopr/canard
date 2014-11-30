@@ -56,7 +56,8 @@ class SQBLResponseObject(SQBLWeirdThingWidget):
                 tag.set("value", str(value))
         valueField.valueChanged.connect(changed)
 
-    def initialiseRestraintFields(self,tagname,defaultElement,checkbox,languageCombo,textField=None,valueField=None):
+    def initialiseRestraintFields(self,tagname,defaultElement,checkbox,languageCombo,
+            textField=None,valueField=None,dateField=None,timeField=None):
         
         toggleMethod = self.connectToggle(checkbox,tagname,defaultElement)
 
@@ -67,12 +68,24 @@ class SQBLResponseObject(SQBLWeirdThingWidget):
             state = QtCore.Qt.Checked
             if valueField is not None:
                 valueField.setValue(float(elem[0].get('value')))
+            if dateField is not None:
+                date = QtCore.QDate().fromString(elem[0].get('value'),format=QtCore.Qt.ISODate)
+                dateField.setDate(date)
+            if timeField is not None:
+                time = QtCore.QTime().fromString(elem[0].get('value'))
+                timeField.setTime(time)
+            #if timeField is not None:
+            #    timeField.setTime(QtCore.QDate(elem[0].get('value'),format=QtCore.Qt.ISODate))
         checkbox.setCheckState(state)
 
         if textField is not None:
            self.connectMLFields(textField,tagname,languageCombo)
         if valueField is not None:
             self.connectValueFields(tagname,valueField)
+        if dateField is not None:
+            self.connectDateFields(tagname,dateField)
+        if timeField is not None:
+            self.connectTimeFields(tagname,timeField)
         checkbox.stateChanged.connect(toggleMethod)
 
     # Connect the minimum and maximum fields so they bound each others values correctly.
@@ -246,6 +259,73 @@ class CodeList(SQBLResponseObject, sqblUI.responseCodeList.Ui_Form):
                 item.setCheckState(QtCore.Qt.Unchecked)
             self.codeListTable.setItem(row,1,item)
         
+class Date(SQBLResponseObject, sqblUI.responseDate.Ui_Form):
+    def __init__(self,element,model):
+        SQBLResponseObject.__init__(self,element,model)
+
+        self.initialiseRestraintFields( tagname = "Minimum",
+                defaultElement = etree.fromstring("<Minimum xmlns='%s' value='0' />"% _namespaces['s']),
+                checkbox = self.hasMinValue,
+                languageCombo = self.languages,
+                textField = self.minValueHint,
+                dateField = self.minValue
+            )
+
+        self.initialiseRestraintFields( tagname = "Maximum",
+                defaultElement = etree.fromstring("<Maximum xmlns='%s' value='0' />"% _namespaces['s']),
+                checkbox = self.hasMaxValue,
+                languageCombo = self.languages,
+                textField = self.maxValueHint,
+                dateField = self.maxValue
+            )
+
+        self.initialiseRestraintFields( tagname = "Hint",
+                defaultElement = etree.fromstring("<Hint xmlns='%s' />"% _namespaces['s']),
+                checkbox = self.hasDisplayHint,
+                languageCombo = self.languages,
+                textField = self.displayHint,
+            )
+
+        self.connectUseTodayField("Minimum",self.minUseToday,self.minValue)
+        self.connectUseTodayField("Maximum",self.maxUseToday,self.maxValue)
+        self.connectToggleField(self.hasMaxValue,self.maxUseToday,self.maxValue)
+        self.connectToggleField(self.hasMinValue,self.minUseToday,self.minValue)
+
+        # Do this as a last step, to select a display language
+        self.connectAddRemoveLanguages(self.addLanguage,self.removeLanguage,self.languages)
+        self.configureLanguages(self.languages)
+
+    def connectToggleField(self,toggler,todayField,dateField):
+        def toggleDateField(value):
+            dateField.setEnabled(value and not todayField.isChecked() )
+        toggler.toggled.connect(toggleDateField)
+
+    def connectUseTodayField(self,tagname,todayField,dateField):
+
+        def useTodayToggled(value):
+            #todayField.setEnabled(not value)
+            tag = self.element.xpath("./s:%s" % (tagname),namespaces=_namespaces)[0]
+            #tag = self.element.xpath("./s:Maximum",namespaces=_namespaces)[0]
+            if value:
+                tag.set("value", "#today")
+            else:
+                tag.set("value", "")
+        todayField.toggled.connect(useTodayToggled)
+
+        tags = self.element.xpath("./s:%s" % (tagname),namespaces=_namespaces)
+        if len(tags) > 0:
+            useToday = tags[0].get("value",None)
+            if useToday == "#today":
+                dateField.setEnabled(False)
+                todayField.setChecked(True)
+
+    def connectDateFields(self,tagname,valueField):
+        def changed(value):
+            if valueField.isEnabled():
+                tag = self.element.xpath("./s:%s" % (tagname),namespaces=_namespaces)[0]
+                val = str(valueField.date().toString(format=QtCore.Qt.ISODate))
+                tag.set("value", val)
+        valueField.dateChanged.connect(changed)
 
 class Number(SQBLResponseObject, sqblUI.responseNumber.Ui_Form):
     def __init__(self,element,model):
@@ -341,7 +421,45 @@ class Text(SQBLResponseObject, sqblUI.responseText.Ui_Form):
 
         self.connectAddRemoveLanguages(self.addLanguage,self.removeLanguage,self.languages)
         self.configureLanguages(self.languages)
+        
+class Time(SQBLResponseObject, sqblUI.responseTime.Ui_Form):
+    def __init__(self,element,model):
+        SQBLResponseObject.__init__(self,element,model)
 
+        self.initialiseRestraintFields( tagname = "Minimum",
+                defaultElement = etree.fromstring("<Minimum xmlns='%s' value='0' />"% _namespaces['s']),
+                checkbox = self.hasMinValue,
+                languageCombo = self.languages,
+                textField = self.minValueHint,
+                timeField = self.minValue
+            )
+
+        self.initialiseRestraintFields( tagname = "Maximum",
+                defaultElement = etree.fromstring("<Maximum xmlns='%s' value='0' />"% _namespaces['s']),
+                checkbox = self.hasMaxValue,
+                languageCombo = self.languages,
+                textField = self.maxValueHint,
+                timeField = self.maxValue
+            )
+
+        self.initialiseRestraintFields( tagname = "Hint",
+                defaultElement = etree.fromstring("<Hint xmlns='%s' />"% _namespaces['s']),
+                checkbox = self.hasDisplayHint,
+                languageCombo = self.languages,
+                textField = self.displayHint,
+            )
+
+        # Do this as a last step, to select a display language
+        self.connectAddRemoveLanguages(self.addLanguage,self.removeLanguage,self.languages)
+        self.configureLanguages(self.languages)
+
+    def connectTimeFields(self,tagname,valueField):
+        def changed(value):
+            if valueField.isEnabled():
+                tag = self.element.xpath("./s:%s" % (tagname),namespaces=_namespaces)[0]
+                val = str(valueField.time().toString())
+                tag.set("value", val)
+        valueField.timeChanged.connect(changed)
 
 class Boolean(SQBLResponseObject, sqblUI.responseBoolean.Ui_Form):
     def __init__(self,element,model):

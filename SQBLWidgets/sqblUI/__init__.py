@@ -20,9 +20,11 @@ import questionText
 import repositorySearch
 import responseBoolean
 import responseCodeList
+import responseDate
 import responseNumber
 import responseTab
 import responseText
+import responseTime
 import statement
 import statementText
 import stopModule

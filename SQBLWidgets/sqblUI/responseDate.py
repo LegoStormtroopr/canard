@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/responseDate.ui'
 #
-# Created: Sun Nov 23 12:23:05 2014
+# Created: Sun Nov 30 11:27:06 2014
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -94,13 +94,11 @@ class Ui_Form(object):
         self.gridLayout.addWidget(self.maxUseToday, 8, 1, 1, 3)
 
         self.retranslateUi(Form)
-        QtCore.QObject.connect(self.hasMinValue, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.minValueHint.setEnabled)
-        QtCore.QObject.connect(self.hasMaxValue, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.maxValueHint.setEnabled)
-        QtCore.QObject.connect(self.hasDisplayHint, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.displayHint.setEnabled)
-        QtCore.QObject.connect(self.hasMinValue, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.minValue.setEnabled)
-        QtCore.QObject.connect(self.hasMaxValue, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.maxValue.setEnabled)
-        QtCore.QObject.connect(self.hasMinValue, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.minUseToday.setEnabled)
-        QtCore.QObject.connect(self.hasMaxValue, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.maxUseToday.setEnabled)
+        QtCore.QObject.connect(self.hasMinValue, QtCore.SIGNAL(_fromUtf8("clicked(bool)")), self.minValueHint.setEnabled)
+        QtCore.QObject.connect(self.hasMaxValue, QtCore.SIGNAL(_fromUtf8("clicked(bool)")), self.maxValueHint.setEnabled)
+        QtCore.QObject.connect(self.hasDisplayHint, QtCore.SIGNAL(_fromUtf8("clicked(bool)")), self.displayHint.setEnabled)
+        QtCore.QObject.connect(self.hasMinValue, QtCore.SIGNAL(_fromUtf8("clicked(bool)")), self.minUseToday.setEnabled)
+        QtCore.QObject.connect(self.hasMaxValue, QtCore.SIGNAL(_fromUtf8("clicked(bool)")), self.maxUseToday.setEnabled)
         QtCore.QObject.connect(self.maxUseToday, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.maxValue.setDisabled)
         QtCore.QObject.connect(self.minUseToday, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.minValue.setDisabled)
         QtCore.QMetaObject.connectSlotsByName(Form)

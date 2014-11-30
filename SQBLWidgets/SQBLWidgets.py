@@ -289,6 +289,12 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
         responseField = Responses.Boolean(element,self.model) 
         self.responseTabs.addTab(responseField,"Boolean")
 
+    def addDateResponse(self):
+        element = etree.Element("{%s}Date"%(_namespaces['s']))
+        self.responses.append(element)
+        responseField = Responses.Date(element,self.model) 
+        self.responseTabs.addTab(responseField,"Date")
+
     def addNumericResponse(self):
         element = etree.Element("{%s}Number"%(_namespaces['s']))
         self.responses.append(element)
@@ -300,6 +306,12 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
         self.responses.append(element)
         responseField = Responses.Text(element,self.model) 
         self.responseTabs.addTab(responseField,"Text")
+
+    def addTimeResponse(self):
+        element = etree.Element("{%s}Time"%(_namespaces['s']))
+        self.responses.append(element)
+        responseField = Responses.Time(element,self.model) 
+        self.responseTabs.addTab(responseField,"Time")
 
     def addCodeListResponse(self):
         element = etree.fromstring("""
@@ -319,15 +331,19 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
         arb.setPopupMode(QtGui.QToolButton.InstantPopup)
 
         arbMenu = QtGui.QMenu("Add Response", arb)
-        addNum = arbMenu.addAction("Numeric Response")
-        addText = arbMenu.addAction("Text Response")
-        addCode = arbMenu.addAction("CodeList Response")
         addBool = arbMenu.addAction("Boolean Response")
+        addDate = arbMenu.addAction("Date Response")
+        addCode = arbMenu.addAction("CodeList Response")
+        addNum  = arbMenu.addAction("Numeric Response")
+        addText = arbMenu.addAction("Text Response")
+        addTime = arbMenu.addAction("Time Response")
         
+        addBool.triggered.connect(self.addBooleanResponse)
+        addCode.triggered.connect(self.addCodeListResponse)
+        addDate.triggered.connect(self.addDateResponse)
         addNum.triggered.connect(self.addNumericResponse)
         addText.triggered.connect(self.addTextResponse)
-        addCode.triggered.connect(self.addCodeListResponse)
-        addBool.triggered.connect(self.addBooleanResponse)
+        addTime.triggered.connect(self.addTimeResponse)
         arb.setMenu(arbMenu)
 
         self.responseTabs.setCornerWidget(arb)
@@ -337,6 +353,10 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
                 responseField = Responses.CodeList(response,self.model) 
                 #self.responseType.setCurrentIndex(2)
                 tabName = "Codelist"
+            elif response.tag == _ns("s","Date"):
+                responseField = Responses.Date(response,self.model) 
+                #self.responseType.setCurrentIndex(1)
+                tabName = "Date"
             elif response.tag == _ns("s","Number"):
                 responseField = Responses.Number(response,self.model) 
                 #self.responseType.setCurrentIndex(1)
@@ -345,6 +365,10 @@ class Question(SQBLNamedWidget, sqblUI.question.Ui_Form):
                 responseField = Responses.Text(response,self.model) 
                 #self.responseType.setCurrentIndex(0)
                 tabName = "Text"
+            elif response.tag == _ns("s","Time"):
+                responseField = Responses.Time(response,self.model) 
+                #self.responseType.setCurrentIndex(1)
+                tabName = "Time"
             elif response.tag == _ns("s","Boolean"):
                 responseField = Responses.Boolean(response,self.model) 
                 #self.responseType.setCurrentIndex(0)
