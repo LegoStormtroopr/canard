@@ -17,7 +17,6 @@ widgets:
 	pyuic4 ui/loopFor.ui -o SQBLWidgets/sqblUI/loopFor.py
 	pyuic4 ui/moduleLogic.ui -o SQBLWidgets/sqblUI/moduleLogic.py
 	pyuic4 ui/newLanguageTab.ui -o SQBLWidgets/sqblUI/newLanguageTab.py
-	pyuic4 ui/repositorySearch.ui -o SQBLWidgets/sqblUI/repositorySearch.py
 	pyuic4 ui/responseBoolean.ui -o SQBLWidgets/sqblUI/responseBoolean.py
 	pyuic4 ui/responseCodeList.ui -o SQBLWidgets/sqblUI/responseCodeList.py
 	pyuic4 ui/responseDate.ui -o SQBLWidgets/sqblUI/responseDate.py
