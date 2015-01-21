@@ -42,7 +42,18 @@ How to install (Windows)
 2. Extract to a location of your choosing.
 3. (Optional) [Install Graphviz](http://www.graphviz.org/), however without this installed the flowchart panel be able to provide illustrations of the logical routing.
 
-How to Install (Linux & Mac)
+How to Install (Ubuntu 14.04)
+-------------
+sudo apt-get install pyqt4-dev-tools build-essential python-pygraphviz git
+git clone https://github.com/LegoStormtroopr/canard.git
+cd canard
+make
+git submodule add https://github.com/LegoStormtroopr/sqbl-schema.git
+ln -s sqbl-schema/Schemas/ sqbl
+git submodule add -f https://github.com/LegoStormtroopr/roxy-sqbl-instrument-creator.git roxy
+python canard_main.py
+
+How to Install (Mac)
 -------------
 Coming soon!
 
