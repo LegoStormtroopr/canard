@@ -44,6 +44,8 @@ How to install (Windows)
 
 How to Install (Ubuntu 14.04)
 -------------
+
+```
 sudo apt-get install pyqt4-dev-tools build-essential python-pygraphviz git
 git clone https://github.com/LegoStormtroopr/canard.git
 cd canard
@@ -52,6 +54,7 @@ git submodule add https://github.com/LegoStormtroopr/sqbl-schema.git
 ln -s sqbl-schema/Schemas/ sqbl
 git submodule add -f https://github.com/LegoStormtroopr/roxy-sqbl-instrument-creator.git roxy
 python canard_main.py
+```
 
 How to Install (Mac)
 -------------
