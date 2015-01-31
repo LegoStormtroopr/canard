@@ -4,4 +4,6 @@ PRIMARY AUTHORS are and/or have been (alphabetic order):
   Github: <https://github.com/LegoStormtroopr/>
 
 CONTRIBUTORS are and/or have been (alphabetic order):
-* None yet... be the first
+
+* Zammit, Adam
+  Github: <https://github.com/adamzammit/>

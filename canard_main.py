@@ -21,8 +21,8 @@ if getattr(sys, 'frozen', False):
 #elif __file__:
 #    _INSTALLDIRECTORY = os.path.dirname(__file__) +"/"
 else:
-    # Must be in development still
-    _INSTALLDIRECTORY = "c:\\Users\\theodore\\Documents\\GitHub\\canard\\"
+    # Must be in development still (or running from source)
+    _INSTALLDIRECTORY = os.path.dirname(os.path.abspath(__file__)) + "/"
 
 _INSTALLDIRECTORY = _INSTALLDIRECTORY.replace("\\","/")
 _baseURL = _INSTALLDIRECTORY+"roxy"
