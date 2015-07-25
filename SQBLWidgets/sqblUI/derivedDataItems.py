@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/wordSubstitutions.ui'
+# Form implementation generated from reading ui file 'ui/derivedDataItems.ui'
 #
-# Created: Sat Jul 25 12:17:20 2015
+# Created: Sat Jul 25 12:16:42 2015
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -32,6 +32,6 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QtGui.QApplication.translate("Form", "Form", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("Form", "<html><head/><body><p>Right click on \"Word Substitutions\" in the \"Module Components\" pane to add a new word substitution.</p>\n"
-"<p>Alternatively, you can use the keyboard shortcut: <tt>Crtl+Shift+W</tt></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
+        self.label.setText(QtGui.QApplication.translate("Form", "<html><head/><body><p>Right click on \"Derived Data Items\" in the \"Module Components\" pane to add a new derived data item.</p>\n"
+"<!-- p>Alternatively, you can use the keyboard shortcut: <tt>Crtl+Shift+W</tt></p --></body></html>", None, QtGui.QApplication.UnicodeUTF8))
 
