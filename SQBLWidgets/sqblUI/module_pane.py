@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/SQBL_module_pane.ui'
 #
-# Created: Sun Nov 30 11:26:53 2014
+# Created: Sat Jul 25 11:37:25 2015
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!

@@ -4,6 +4,7 @@ import branch
 import bulkQuestionEditor
 import conditionalTree
 import conditionalTreeText
+import derivedDataItems 
 import languagePicker
 import logicNodeText
 import loopFor
@@ -32,4 +33,6 @@ import subQuestion
 import unsupportedWidget
 import wordSub
 import wordSubText
+import wordSubstitutions
+
 #import canard_icons as icons

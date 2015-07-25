@@ -17,6 +17,14 @@ class UnsupportedWidget(SQBLWidget,sqblUI.unsupportedWidget.Ui_Form):
     def __init__(self):
         SQBLWidget.__init__(self,None,None)
 
+class WordSubstitutions(SQBLWidget,sqblUI.wordSubstitutions.Ui_Form):
+    def __init__(self):
+        SQBLWidget.__init__(self,None,None)
+
+class DerivedDataItems(SQBLWidget,sqblUI.derivedDataItems.Ui_Form):
+    def __init__(self):
+        SQBLWidget.__init__(self,None,None)
+
 class BulkQuestionEditor(SQBLWeirdThingWidget, sqblUI.bulkQuestionEditor.Ui_Form):
     def __init__(self,element,model):
         SQBLWeirdThingWidget.__init__(self,element,model,langXPath="//")
