@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui, QtWebKit
 import pydot
 import os, sys, StringIO
@@ -10,7 +11,8 @@ AppSettings = QtCore.QSettings("sqbl.org", "Canard-App")
 
 from SQBLWidgets.SQBLmodel import _ns
 
-VERSION = "0.2.4B"
+VERSION = "0.2.5B"
+CODENAME = "Mötley Crüe"
 CRITICAL_SIZE = 50 # Number of nodes before refreshes get slow.
 
 _APPWINDOWTITLE = "Canard Question Module Editor"
@@ -180,13 +182,16 @@ class MainWindow(QtGui.QMainWindow, sqblUI.sqbl_main.Ui_MainWindow):
         self.model.addCalculatedDataItem()
 
     def vanityBox(self):
+        codename=""
+        if CODENAME:
+            codename = "<br> <small> codename: {codename}</small>".format(codename=CODENAME)
         vanityText = """<html>
 <head>
 <meta name="qrichtext" content="1" />
 </head>
 <body>
 <p>
-<h3>Canard - Question Module Editor v{version}</h3>
+<h3>Canard - Question Module Editor v{version} {codename}</h3>
 </p>
 <p>
 <br>Released under GPLv3 Licence<br>
@@ -200,7 +205,7 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
 </p>
 </body>
 </html>
-""".format(version=VERSION)
+""".format(version=VERSION,codename=codename)
         QtGui.QMessageBox.about(self,"About Canard Question Module Editor", vanityText )
 
     def refreshImportMenu(self):
@@ -270,8 +275,8 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
             if runType == "import":
                 self.open(out)
             elif runType == "export":
-                with open(filename,"w") as f:
-                    f.write(out)
+                with open(filename,"wb") as f:
+                    f.write(out.encode("UTF-8"))
         if extension in ['py']:
             sys.path.append('./%s/'%importDir)
             import plugin
@@ -370,6 +375,10 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
             newWidget = SQBLWidgets.QuestionGroup(self.selected,self.model)
         if self.selected.tag == _ns("s","ModuleLogic"):
             newWidget = SQBLWidgets.ModuleLogic(self.selected,self.model)
+        if self.selected.tag == _ns("s","WordSubstitutions"):
+            newWidget = SQBLWidgets.WordSubstitutions()
+        #if self.selected.tag == _ns("s","DerivedDataItems"):
+        #    newWidget = SQBLWidgets.DerivedDataItems()
         if newWidget is None:
             newWidget = SQBLWidgets.UnsupportedWidget()
         if newWidget is not None:

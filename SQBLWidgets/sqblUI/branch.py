@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/branch.ui'
 #
-# Created: Sun Nov 30 11:26:54 2014
+# Created: Sat Jul 25 12:16:37 2015
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!

@@ -11,6 +11,7 @@ widgets:
 	pyuic4 ui/bulkQuestionEditor.ui -o SQBLWidgets/sqblUI/bulkQuestionEditor.py
 	pyuic4 ui/conditionalTree.ui -o SQBLWidgets/sqblUI/conditionalTree.py
 	pyuic4 ui/conditionalTreeText.ui -o SQBLWidgets/sqblUI/conditionalTreeText.py
+	pyuic4 ui/derivedDataItems.ui -o SQBLWidgets/sqblUI/derivedDataItems.py
 	pyuic4 ui/languagePicker.ui -o SQBLWidgets/sqblUI/languagePicker.py
 	pyuic4 ui/logicNodeText.ui -o SQBLWidgets/sqblUI/logicNodeText.py
 	pyuic4 ui/logicNodeText.ui -o SQBLWidgets/sqblUI/logicNodeText.py
@@ -39,6 +40,7 @@ widgets:
 	pyuic4 ui/unsupportedWidget.ui -o SQBLWidgets/sqblUI/unsupportedWidget.py
 	pyuic4 ui/wordSub.ui -o SQBLWidgets/sqblUI/wordSub.py
 	pyuic4 ui/wordSubText.ui -o SQBLWidgets/sqblUI/wordSubText.py
+	pyuic4 ui/wordSubstitutions.ui -o SQBLWidgets/sqblUI/wordSubstitutions.py
 
 #x.py: X.ui
 #	pyuic ui/X.ui -o SQBLWidgets/sqblUI/x.py
