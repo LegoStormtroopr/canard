@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui, QtWebKit
-import pydot
+#import pydot
 import os, sys, StringIO
 from SQBLWidgets import sqblUI, SQBLmodel, CanardPreferenceDialog
 import SQBLWidgets
 import ConfigParser
 from lxml import etree
 import Canard_settings as settings
+import igraph as ig
 AppSettings = QtCore.QSettings("sqbl.org", "Canard-App")
 
 from SQBLWidgets.SQBLmodel import _ns
@@ -522,8 +523,38 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
         if x > CRITICAL_SIZE: return
         if not self.autoFlowchartRefresh: return
         self.updateFlowchart()
-        
+
     def updateFlowchart(self):
+        from lxml import etree
+        #with open("../roxy-sqbl-instrument-creator/SQBL-Module_to_HTML.xsl") as f:
+
+        class WebPage(QtWebKit.QWebPage):
+            def javaScriptConsoleMessage(self, msg, line, source):
+                print('%s line %d: %s' % (source, line, msg))
+
+        with open("roxy/SQBL_to_flow.xsl") as f:
+
+            class FileResolver(etree.Resolver):
+                def resolve(self, url, pubid, context):
+                    return self.resolve_filename(url, context)
+
+            parser = etree.XMLParser()
+            parser.resolvers.add(FileResolver())
+
+            xslt = etree.parse(f,parser)
+            transform = etree.XSLT(xslt)
+            data = self.model.getXMLetree()
+
+            page = WebPage()
+            self.flowchart_previewer.setPage(page)
+
+
+            out = str(transform(data,rootdir=etree.XSLT.strparam(_INSTALLDIRECTORY+"./roxy/")))
+            print(out)
+
+            self.flowchart_previewer.setContent(str(out), "text/html", QtCore.QUrl(_baseURL))
+        
+    def updateFlowchartOld(self):
         from lxml import etree
         import tempfile
         with open("roxy/SQBL_to_Skips.xsl") as f:
@@ -533,9 +564,14 @@ Primary Developer: <a href="http:/about.me/legostormtroopr">Samuel Spencer</a>
             out = etree.XML(str(transform(data)))
             skips = out.xpath('//skip:skips2', namespaces={"skip":"http://legostormtoopr/skips"})[0]
 
-        flow = pydot.Dot(graph_type='digraph',fontsize=7)
+        #flow = pydot.Dot(graph_type='digraph',fontsize=7)
+        nodes = []
 
         for link in skips.iterchildren(tag="{http://legostormtoopr/skips}link"):
+            from_ = link.get('from', default="Start")
+            count = count + 1
+        for link in skips.iterchildren(tag="{http://legostormtoopr/skips}link"):
+            g.addVert 
             shape = "oval"
             edgeColor = "black"
             if link.get('type') == "StopModule":

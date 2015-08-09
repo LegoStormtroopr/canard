@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/sqbl_main.ui'
 #
-# Created: Sat Jul 25 12:16:34 2015
+# Created: Sat Aug  8 16:27:09 2015
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -170,26 +170,17 @@ class Ui_MainWindow(object):
         self.dockWidgetContents_3.setObjectName(_fromUtf8("dockWidgetContents_3"))
         self.gridLayout_3 = QtGui.QGridLayout(self.dockWidgetContents_3)
         self.gridLayout_3.setObjectName(_fromUtf8("gridLayout_3"))
+        self.flowchart_previewer = QtWebKit.QWebView(self.dockWidgetContents_3)
+        self.flowchart_previewer.setUrl(QtCore.QUrl(_fromUtf8("about:blank")))
+        self.flowchart_previewer.setObjectName(_fromUtf8("flowchart_previewer"))
+        self.gridLayout_3.addWidget(self.flowchart_previewer, 0, 0, 1, 3)
+        spacerItem1 = QtGui.QSpacerItem(218, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.gridLayout_3.addItem(spacerItem1, 1, 0, 1, 1)
         self.copyImage = QtGui.QPushButton(self.dockWidgetContents_3)
         self.copyImage.setMinimumSize(QtCore.QSize(0, 0))
         self.copyImage.setMaximumSize(QtCore.QSize(80, 16777215))
         self.copyImage.setObjectName(_fromUtf8("copyImage"))
         self.gridLayout_3.addWidget(self.copyImage, 1, 1, 1, 1)
-        self.scrollArea = QtGui.QScrollArea(self.dockWidgetContents_3)
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setObjectName(_fromUtf8("scrollArea"))
-        self.scrollAreaWidgetContents = QtGui.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 383, 69))
-        self.scrollAreaWidgetContents.setObjectName(_fromUtf8("scrollAreaWidgetContents"))
-        self.verticalLayout_3 = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
-        self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
-        self.flowchart = QtGui.QLabel(self.scrollAreaWidgetContents)
-        self.flowchart.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
-        self.flowchart.setText(_fromUtf8(""))
-        self.flowchart.setObjectName(_fromUtf8("flowchart"))
-        self.verticalLayout_3.addWidget(self.flowchart)
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-        self.gridLayout_3.addWidget(self.scrollArea, 0, 0, 1, 3)
         self.pushButton = QtGui.QPushButton(self.dockWidgetContents_3)
         self.pushButton.setMaximumSize(QtCore.QSize(80, 16777215))
         self.pushButton.setCheckable(True)
